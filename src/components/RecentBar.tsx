@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import type { ToolMeta } from '../types';
+import { useTheme } from '../theme';
 
 interface RecentBarProps {
   tools: ToolMeta[];
@@ -7,12 +8,13 @@ interface RecentBarProps {
 
 export default function RecentBar({ tools }: RecentBarProps) {
   const navigate = useNavigate();
+  const t = useTheme();
 
   if (tools.length === 0) return null;
 
   return (
     <div style={{ marginBottom: 24 }}>
-      <div style={{ color: '#888890', fontSize: 13, marginBottom: 10 }}>
+      <div style={{ color: t.textSecondary, fontSize: 13, marginBottom: 10 }}>
         最近使用
       </div>
       <div
@@ -32,11 +34,11 @@ export default function RecentBar({ tools }: RecentBarProps) {
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              background: '#141418',
-              border: '0.5px solid #2a2a30',
+              background: t.card,
+              border: `0.5px solid ${t.border}`,
               borderRadius: 20,
               padding: '6px 14px',
-              color: '#E0E0E8',
+              color: t.text,
               cursor: 'pointer',
               fontSize: 13,
               whiteSpace: 'nowrap',
@@ -46,11 +48,11 @@ export default function RecentBar({ tools }: RecentBarProps) {
             }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLButtonElement).style.borderColor =
-                '#3a3a48';
+                t.borderHover;
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLButtonElement).style.borderColor =
-                '#2a2a30';
+                t.border;
             }}
           >
             <span>{tool.icon}</span>

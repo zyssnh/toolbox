@@ -1,17 +1,18 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import { useTheme } from '../../theme';
 
-const styles: Record<string, React.CSSProperties> = {
+const makeStyles = (t: ReturnType<typeof useTheme>): Record<string, React.CSSProperties> => ({
   wrapper: {
     padding: 20,
   },
   textarea: {
     width: '100%',
     minHeight: 220,
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 6,
     padding: '8px 12px',
-    color: '#E0E0E8',
+    color: t.text,
     fontFamily: "'JetBrains Mono', monospace",
     fontSize: 13,
     lineHeight: 1.6,
@@ -27,7 +28,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
   },
   btn: {
-    background: '#4F8EF7',
+    background: t.primary,
     color: 'white',
     border: 'none',
     borderRadius: 6,
@@ -37,9 +38,9 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
   },
   btnSecondary: {
-    background: '#1A1A1F',
-    border: '0.5px solid #2a2a30',
-    color: '#E0E0E8',
+    background: t.hover,
+    border: `0.5px solid ${t.border}`,
+    color: t.text,
     borderRadius: 6,
     padding: '8px 20px',
     cursor: 'pointer',
@@ -47,18 +48,18 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
   },
   charCount: {
-    color: '#888890',
+    color: t.textSecondary,
     fontSize: 12,
     fontFamily: "'JetBrains Mono', monospace",
     marginLeft: 'auto',
   },
   resultArea: {
-    background: '#0F0F11',
-    border: '0.5px #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 8,
     padding: 16,
     fontFamily: "'JetBrains Mono', monospace",
-    color: '#39D98A',
+    color: t.green,
     fontSize: 13,
     lineHeight: 1.7,
     whiteSpace: 'pre-wrap' as const,
@@ -66,10 +67,9 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 16,
     maxHeight: 480,
     overflow: 'auto',
-    borderStyle: 'solid',
   },
   errorArea: {
-    background: '#0F0F11',
+    background: t.inputBg,
     border: '0.5px solid #FF5C5C',
     borderRadius: 8,
     padding: 16,
@@ -81,15 +81,18 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 16,
   },
   label: {
-    color: '#888890',
+    color: t.textSecondary,
     fontSize: 13,
     fontWeight: 500,
     marginBottom: 6,
     display: 'block',
   },
-};
+});
 
 const TextJson: React.FC = () => {
+  const t = useTheme();
+  const styles = useMemo(() => makeStyles(t), [t]);
+
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
   const [isError, setIsError] = useState(false);

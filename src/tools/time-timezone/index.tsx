@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTheme } from '../../theme';
 
 interface CityTime {
   name: string;
@@ -35,12 +36,12 @@ function getUTCOffset(date: Date, timezone: string): string {
   return `UTC${sign}${hours}:${String(minutes).padStart(2, '0')}`;
 }
 
-const styles: Record<string, React.CSSProperties> = {
+const makeStyles = (t: ReturnType<typeof useTheme>): Record<string, React.CSSProperties> => ({
   container: {
     padding: 20,
     fontFamily: "'JetBrains Mono', monospace",
-    color: '#E0E0E8',
-    background: '#0F0F11',
+    color: t.text,
+    background: t.bg,
     minHeight: '100%',
   },
   headerRow: {
@@ -52,24 +53,24 @@ const styles: Record<string, React.CSSProperties> = {
   title: {
     fontSize: 18,
     fontWeight: 600,
-    color: '#E0E0E8',
+    color: t.text,
   },
   liveIndicator: {
     display: 'flex',
     alignItems: 'center',
     gap: 8,
     fontSize: 12,
-    color: '#39D98A',
+    color: t.green,
   },
   liveDot: {
     width: 8,
     height: 8,
     borderRadius: '50%',
-    background: '#39D98A',
+    background: t.green,
     display: 'inline-block',
   },
   cityCard: {
-    background: '#141418',
+    background: t.card,
     borderRadius: 8,
     padding: 16,
     marginBottom: 10,
@@ -86,15 +87,15 @@ const styles: Record<string, React.CSSProperties> = {
   cityName: {
     fontSize: 15,
     fontWeight: 600,
-    color: '#E0E0E8',
+    color: t.text,
   },
   cityDate: {
     fontSize: 11,
-    color: '#55555F',
+    color: t.textHint,
   },
   cityOffset: {
     fontSize: 11,
-    color: '#a78bfa',
+    color: t.purple,
   },
   cityRight: {
     textAlign: 'right' as const,
@@ -102,12 +103,15 @@ const styles: Record<string, React.CSSProperties> = {
   cityTime: {
     fontSize: 22,
     fontWeight: 700,
-    color: '#39D98A',
+    color: t.green,
     fontFamily: "'JetBrains Mono', monospace",
   },
-};
+});
 
 export default function TimeTimezone() {
+  const t = useTheme();
+  const styles = useMemo(() => makeStyles(t), [t]);
+
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {

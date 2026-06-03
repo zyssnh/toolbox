@@ -6,6 +6,7 @@ import ToolGrid from '../components/ToolGrid';
 import RecentBar from '../components/RecentBar';
 import { toolMetas, categories } from '../registry';
 import { useAppStore } from '../store/useAppStore';
+import { useTheme } from '../theme';
 import type { ToolMeta, Category } from '../types';
 
 const categoryColors: Record<Category, string> = {
@@ -27,6 +28,7 @@ export default function Home() {
   const { searchQuery, setSearchQuery } = useSearch();
   const [activeCategory, setActiveCategory] = useState('all');
   const recentTools = useAppStore((s) => s.recentTools);
+  const t = useTheme();
 
   const recentToolMetas = useMemo(() => {
     const idSet = new Set(recentTools);
@@ -68,20 +70,20 @@ export default function Home() {
           style={{
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: 32,
-            color: '#E0E0E8',
+            color: t.text,
             fontWeight: 600,
             marginBottom: 8,
           }}
         >
           {'// 在线工具箱'}
         </h1>
-        <p style={{ color: '#888890', fontSize: 15, marginBottom: 6 }}>
+        <p style={{ color: t.textSecondary, fontSize: 15, marginBottom: 6 }}>
           无需安装，离线可用的开源工具集合
         </p>
-        <p style={{ color: '#55555F', fontSize: 13, marginBottom: 20 }}>
+        <p style={{ color: t.textHint, fontSize: 13, marginBottom: 20 }}>
           {toolMetas.length} 个工具 · {categories.length - 1} 个分类
         </p>
-        <p style={{ color: '#55555F', fontSize: 12, marginBottom: 24 }}>
+        <p style={{ color: t.textHint, fontSize: 12, marginBottom: 24 }}>
           支持 PWA 安装，可离线使用
         </p>
         <div
@@ -103,7 +105,7 @@ export default function Home() {
         <div
           style={{
             textAlign: 'center',
-            color: '#888890',
+            color: t.textSecondary,
             fontSize: 15,
             padding: '60px 0',
           }}
@@ -137,12 +139,12 @@ export default function Home() {
                 style={{
                   fontSize: 16,
                   fontWeight: 500,
-                  color: '#E0E0E8',
+                  color: t.text,
                 }}
               >
                 {categoryLabelMap[catId] || catId}
               </span>
-              <span style={{ color: '#55555F', fontSize: 13 }}>
+              <span style={{ color: t.textHint, fontSize: 13 }}>
                 ({tools.length})
               </span>
             </div>

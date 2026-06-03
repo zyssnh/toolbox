@@ -1,17 +1,18 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
+import { useTheme } from '../../theme';
 
-const styles: Record<string, React.CSSProperties> = {
+const makeStyles = (t: ReturnType<typeof useTheme>): Record<string, React.CSSProperties> => ({
   wrapper: {
     padding: 20,
   },
   textarea: {
     width: '100%',
     minHeight: 180,
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 6,
     padding: '8px 12px',
-    color: '#E0E0E8',
+    color: t.text,
     fontFamily: "'JetBrains Mono', monospace",
     fontSize: 13,
     lineHeight: 1.6,
@@ -20,7 +21,7 @@ const styles: Record<string, React.CSSProperties> = {
     boxSizing: 'border-box' as const,
   },
   label: {
-    color: '#888890',
+    color: t.textSecondary,
     fontSize: 13,
     fontWeight: 500,
     marginBottom: 6,
@@ -34,7 +35,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexWrap: 'wrap' as const,
   },
   btn: {
-    background: '#4F8EF7',
+    background: t.primary,
     color: 'white',
     border: 'none',
     borderRadius: 6,
@@ -44,12 +45,12 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
   },
   resultArea: {
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 8,
     padding: 16,
     fontFamily: "'JetBrains Mono', monospace",
-    color: '#39D98A',
+    color: t.green,
     fontSize: 14,
     lineHeight: 1.7,
     whiteSpace: 'pre-wrap' as const,
@@ -63,9 +64,9 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 8,
   },
   copyBtn: {
-    background: '#1A1A1F',
-    border: '0.5px solid #2a2a30',
-    color: '#E0E0E8',
+    background: t.hover,
+    border: `0.5px solid ${t.border}`,
+    color: t.text,
     borderRadius: 6,
     padding: '6px 16px',
     cursor: 'pointer',
@@ -73,14 +74,14 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
   },
   copySuccess: {
-    background: '#39D98A',
-    color: '#0F0F11',
+    background: t.green,
+    color: t.bg,
     border: 'none',
   },
   emptyResult: {
-    color: '#555559',
+    color: t.textHint,
   },
-};
+});
 
 function splitWords(text: string): string[] {
   return text
@@ -164,6 +165,9 @@ const converters: Record<CaseName, (text: string) => string> = {
 };
 
 const TextCase: React.FC = () => {
+  const t = useTheme();
+  const styles = useMemo(() => makeStyles(t), [t]);
+
   const [text, setText] = useState('');
   const [result, setResult] = useState('');
   const [activeCase, setActiveCase] = useState<CaseName | null>(null);
@@ -214,7 +218,7 @@ const TextCase: React.FC = () => {
             style={{
               ...styles.btn,
               ...(activeCase === name
-                ? { background: '#39D98A', color: '#0F0F11' }
+                ? { background: t.green, color: t.bg }
                 : {}),
             }}
             onClick={() => handleConvert(name)}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useTheme } from '../../theme';
 
 type Grid = number[][];
 
@@ -136,6 +137,8 @@ function hasWon(grid: Grid): boolean {
 }
 
 const Game2048: React.FC = () => {
+  const t = useTheme();
+
   const [grid, setGrid] = useState<Grid>(() => {
     const g = createEmptyGrid();
     addRandomTile(g);
@@ -230,9 +233,9 @@ const Game2048: React.FC = () => {
   const styles = {
     wrapper: {
       padding: 20,
-      background: '#0F0F11',
+      background: t.bg,
       minHeight: '100%',
-      color: '#E0E0E8',
+      color: t.text,
       display: 'flex',
       flexDirection: 'column' as const,
       alignItems: 'center',
@@ -249,23 +252,23 @@ const Game2048: React.FC = () => {
     title: {
       fontSize: 24,
       fontWeight: 700,
-      color: '#E0E0E8',
+      color: t.text,
     },
     scoreBox: {
-      background: '#141418',
+      background: t.card,
       borderRadius: 8,
       padding: '8px 20px',
       textAlign: 'center' as const,
     },
     scoreLabel: {
       fontSize: 11,
-      color: '#888890',
+      color: t.textSecondary,
       textTransform: 'uppercase' as const,
     },
     scoreValue: {
       fontSize: 22,
       fontWeight: 700,
-      color: '#ec4899',
+      color: t.pink,
     },
     gridContainer: {
       background: '#bbada0',
@@ -287,7 +290,7 @@ const Game2048: React.FC = () => {
       transition: 'all 0.1s ease',
     },
     button: {
-      background: '#4F8EF7',
+      background: t.primary,
       color: 'white',
       border: 'none',
       borderRadius: 6,
@@ -303,7 +306,7 @@ const Game2048: React.FC = () => {
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(15, 15, 17, 0.8)',
+      background: t.card,
       display: 'flex',
       flexDirection: 'column' as const,
       alignItems: 'center',
@@ -312,13 +315,13 @@ const Game2048: React.FC = () => {
       zIndex: 10,
     },
     overlayText: {
-      color: '#E0E0E8',
+      color: t.text,
       fontSize: 28,
       fontWeight: 700,
       marginBottom: 12,
     },
     overlaySub: {
-      color: '#888890',
+      color: t.textSecondary,
       fontSize: 14,
     },
   };

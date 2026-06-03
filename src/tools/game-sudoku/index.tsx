@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useTheme } from '../../theme';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -180,6 +181,8 @@ function isBoardValid(board: Board): boolean {
 }
 
 const GameSudoku: React.FC = () => {
+  const t = useTheme();
+
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [board, setBoard] = useState<Board>(() => createEmptyBoard());
   const [fixedCells, setFixedCells] = useState<FixedBoard>(() =>
@@ -296,9 +299,9 @@ const GameSudoku: React.FC = () => {
   const styles = {
     wrapper: {
       padding: 20,
-      background: '#0F0F11',
+      background: t.bg,
       minHeight: '100%',
-      color: '#E0E0E8',
+      color: t.text,
       display: 'flex',
       flexDirection: 'column' as const,
       alignItems: 'center',
@@ -307,7 +310,7 @@ const GameSudoku: React.FC = () => {
     title: {
       fontSize: 24,
       fontWeight: 700,
-      color: '#E0E0E8',
+      color: t.text,
       marginBottom: 12,
     },
     difficultyRow: {
@@ -316,8 +319,8 @@ const GameSudoku: React.FC = () => {
       marginBottom: 16,
     },
     diffBtn: (active: boolean) => ({
-      background: active ? '#4F8EF7' : '#141418',
-      color: active ? 'white' : '#888890',
+      background: active ? t.primary : t.card,
+      color: active ? 'white' : t.textSecondary,
       border: 'none',
       borderRadius: 6,
       padding: '6px 14px',
@@ -330,7 +333,7 @@ const GameSudoku: React.FC = () => {
       gridTemplateColumns: 'repeat(9, 40px)',
       gridTemplateRows: 'repeat(9, 40px)',
       gap: 0,
-      border: '2px solid #4F8EF7',
+      border: `2px solid ${t.primary}`,
       borderRadius: 4,
       overflow: 'hidden',
       userSelect: 'none' as const,
@@ -343,7 +346,7 @@ const GameSudoku: React.FC = () => {
       const isBoxBorderR = r % BOX_SIZE === BOX_SIZE - 1 && r < SIZE - 1;
       const isBoxBorderC = c % BOX_SIZE === BOX_SIZE - 1 && c < SIZE - 1;
 
-      let bg = '#1A1A1F';
+      let bg = t.hover;
       if (isSelected) bg = '#1e2d44';
       else if (isSameNum && !isSelected) bg = '#181e2b';
 
@@ -354,13 +357,13 @@ const GameSudoku: React.FC = () => {
         alignItems: 'center',
         justifyContent: 'center',
         background: bg,
-        borderRight: isBoxBorderC ? '2px solid #4F8EF7' : '0.5px solid #2a2a30',
-        borderBottom: isBoxBorderR ? '2px solid #4F8EF7' : '0.5px solid #2a2a30',
+        borderRight: isBoxBorderC ? `2px solid ${t.primary}` : `0.5px solid ${t.border}`,
+        borderBottom: isBoxBorderR ? `2px solid ${t.primary}` : `0.5px solid ${t.border}`,
         fontSize: 18,
         fontWeight: isFixed ? 700 : 500,
-        color: isConflict ? '#ff6b6b' : isFixed ? '#E0E0E8' : '#4F8EF7',
+        color: isConflict ? '#ff6b6b' : isFixed ? t.text : t.primary,
         cursor: isFixed ? 'default' : 'pointer',
-        outline: isSelected ? '1px solid #4F8EF7' : 'none',
+        outline: isSelected ? `1px solid ${t.primary}` : 'none',
         boxSizing: 'border-box' as const,
       };
     },
@@ -376,9 +379,9 @@ const GameSudoku: React.FC = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: '#141418',
-      color: '#E0E0E8',
-      border: '0.5px solid #2a2a30',
+      background: t.card,
+      color: t.text,
+      border: `0.5px solid ${t.border}`,
       borderRadius: 6,
       fontSize: 16,
       cursor: 'pointer',
@@ -390,7 +393,7 @@ const GameSudoku: React.FC = () => {
       marginTop: 16,
     },
     button: {
-      background: '#4F8EF7',
+      background: t.primary,
       color: 'white',
       border: 'none',
       borderRadius: 6,
@@ -400,9 +403,9 @@ const GameSudoku: React.FC = () => {
       fontFamily: "'Noto Sans SC', sans-serif",
     },
     secondaryButton: {
-      background: '#141418',
-      color: '#E0E0E8',
-      border: '0.5px solid #2a2a30',
+      background: t.card,
+      color: t.text,
+      border: `0.5px solid ${t.border}`,
       borderRadius: 6,
       padding: '8px 20px',
       fontSize: 14,
@@ -410,7 +413,7 @@ const GameSudoku: React.FC = () => {
       fontFamily: "'Noto Sans SC', sans-serif",
     },
     completeText: {
-      color: '#39D98A',
+      color: t.green,
       fontSize: 18,
       fontWeight: 700,
       marginTop: 8,
@@ -476,7 +479,7 @@ const GameSudoku: React.FC = () => {
 
       {gameComplete && <div style={styles.completeText}>完成! 🎉</div>}
       {checkResult === 'correct' && (
-        <div style={{ color: '#39D98A', fontSize: 14, marginTop: 4 }}>
+        <div style={{ color: t.green, fontSize: 14, marginTop: 4 }}>
           答案正确!
         </div>
       )}

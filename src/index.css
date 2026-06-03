@@ -2,35 +2,87 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+:root {
+  --bg: #0F0F11;
+  --card: #141418;
+  --hover: #1A1A1F;
+  --primary: #4F8EF7;
+  --green: #39D98A;
+  --text: #E0E0E8;
+  --text-secondary: #888890;
+  --border: #2a2a30;
+  --border-hover: #3a3a48;
+  --scrollbar-thumb: #2a2a30;
+  --scrollbar-thumb-hover: #3a3a42;
+  --input-bg: #0F0F11;
+  --option-bg: #141418;
+}
+
+[data-theme="light"] {
+  --bg: #F5F5F8;
+  --card: #FFFFFF;
+  --hover: #F0F0F3;
+  --primary: #3B7DE6;
+  --green: #2EB87A;
+  --text: #1A1A24;
+  --text-secondary: #6B6B76;
+  --border: #E0E0E4;
+  --border-hover: #C4C4CC;
+  --scrollbar-thumb: #D0D0D8;
+  --scrollbar-thumb-hover: #B0B0B8;
+  --input-bg: #F5F5F8;
+  --option-bg: #FFFFFF;
+}
+
 body {
-  background: #0F0F11;
-  color: #E0E0E8;
+  background: var(--bg);
+  color: var(--text);
   font-family: 'Noto Sans SC', sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0F0F11; }
-::-webkit-scrollbar-thumb { background: #2a2a30; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #3a3a42; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
 
 input, textarea, select {
-  background: #0F0F11;
-  border: 0.5px solid #2a2a30;
+  background: var(--input-bg);
+  border: 0.5px solid var(--border);
   border-radius: 6px;
   padding: 8px 12px;
-  color: #E0E0E8;
+  color: var(--text);
   font-family: 'Noto Sans SC', sans-serif;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.3s ease;
 }
 input:focus, textarea:focus, select:focus {
-  border-color: #4F8EF7;
+  border-color: var(--primary);
 }
 
-select option { background: #141418; }
+select option { background: var(--option-bg); }
 
-a { color: #4F8EF7; text-decoration: none; }
+a { color: var(--primary); text-decoration: none; }
 a:hover { color: #7aabff; }
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle-btn {
+  background: none;
+  border: 0.5px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: background 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.theme-toggle-btn:hover {
+  background: var(--hover);
+  border-color: var(--border-hover);
+}

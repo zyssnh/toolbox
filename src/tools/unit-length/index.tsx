@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTheme } from '../../theme';
 
 const units: { key: string; label: string; toMeters: number }[] = [
   { key: 'km', label: '千米 (km)', toMeters: 1000 },
@@ -13,6 +14,7 @@ const units: { key: string; label: string; toMeters: number }[] = [
 ];
 
 const UnitLength: React.FC = () => {
+  const t = useTheme();
   const [value, setValue] = useState<string>('1');
   const [unit, setUnit] = useState<string>('m');
 
@@ -24,12 +26,12 @@ const UnitLength: React.FC = () => {
     wrapper: {
       padding: 20,
       fontFamily: "'Noto Sans SC', sans-serif",
-      background: '#0F0F11',
+      background: t.bg,
       minHeight: '100%',
-      color: '#E0E0E8',
+      color: t.text,
     } as React.CSSProperties,
     title: {
-      color: '#E0E0E8',
+      color: t.text,
       fontSize: 16,
       fontWeight: 500,
       marginBottom: 20,
@@ -42,27 +44,27 @@ const UnitLength: React.FC = () => {
       flexWrap: 'wrap',
     } as React.CSSProperties,
     label: {
-      color: '#888890',
+      color: t.textSecondary,
       fontSize: 13,
       marginBottom: 4,
     } as React.CSSProperties,
     input: {
-      background: '#0F0F11',
-      border: '0.5px solid #2a2a30',
+      background: t.inputBg,
+      border: `0.5px solid ${t.border}`,
       borderRadius: 6,
       padding: '8px 12px',
-      color: '#E0E0E8',
+      color: t.text,
       fontFamily: "'JetBrains Mono', monospace",
       fontSize: 15,
       width: 180,
       outline: 'none',
     } as React.CSSProperties,
     select: {
-      background: '#0F0F11',
-      border: '0.5px solid #2a2a30',
+      background: t.inputBg,
+      border: `0.5px solid ${t.border}`,
       borderRadius: 6,
       padding: '8px 12px',
-      color: '#E0E0E8',
+      color: t.text,
       fontFamily: "'Noto Sans SC', sans-serif",
       fontSize: 14,
       outline: 'none',
@@ -74,19 +76,19 @@ const UnitLength: React.FC = () => {
       gap: 12,
     } as React.CSSProperties,
     card: {
-      background: '#141418',
-      border: '0.5px solid #2a2a30',
+      background: t.card,
+      border: `0.5px solid ${t.border}`,
       borderRadius: 8,
       padding: 16,
     } as React.CSSProperties,
     cardUnit: {
-      color: '#888890',
+      color: t.textSecondary,
       fontSize: 12,
       marginBottom: 8,
     } as React.CSSProperties,
     cardValue: {
       fontFamily: "'JetBrains Mono', monospace",
-      color: '#39D98A',
+      color: t.green,
       fontSize: 18,
       wordBreak: 'break-all',
     } as React.CSSProperties,

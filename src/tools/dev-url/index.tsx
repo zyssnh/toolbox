@@ -1,48 +1,8 @@
 import React, { useState, useCallback } from 'react';
-
-const styles: Record<string, React.CSSProperties> = {
-  container: { padding: 20 },
-  textarea: {
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
-    borderRadius: 6,
-    padding: '8px 12px',
-    color: '#E0E0E8',
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 14,
-    width: '100%',
-    minHeight: 100,
-    resize: 'vertical',
-    boxSizing: 'border-box',
-    outline: 'none',
-    lineHeight: 1.6,
-  },
-  label: { color: '#888890', fontSize: 13, marginBottom: 6 },
-  btnRow: { display: 'flex', gap: 10, margin: '12px 0' },
-  primaryBtn: {
-    background: '#4F8EF7',
-    color: '#fff',
-    border: 'none',
-    borderRadius: 6,
-    padding: '8px 20px',
-    cursor: 'pointer',
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 13,
-  },
-  secondaryBtn: {
-    background: '#1A1A1F',
-    border: '0.5px solid #2a2a30',
-    borderRadius: 6,
-    padding: '8px 20px',
-    color: '#E0E0E8',
-    cursor: 'pointer',
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 13,
-  },
-  error: { color: '#f64747', fontSize: 13, marginTop: 8, fontFamily: "'JetBrains Mono', monospace" },
-};
+import { useTheme } from '../../theme';
 
 export default function DevUrl() {
+  const t = useTheme();
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
@@ -73,6 +33,48 @@ export default function DevUrl() {
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   }, [output]);
+
+  const styles: Record<string, React.CSSProperties> = {
+    container: { padding: 20 },
+    textarea: {
+      background: t.inputBg,
+      border: `0.5px solid ${t.border}`,
+      borderRadius: 6,
+      padding: '8px 12px',
+      color: t.text,
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 14,
+      width: '100%',
+      minHeight: 100,
+      resize: 'vertical',
+      boxSizing: 'border-box',
+      outline: 'none',
+      lineHeight: 1.6,
+    },
+    label: { color: t.textSecondary, fontSize: 13, marginBottom: 6 },
+    btnRow: { display: 'flex', gap: 10, margin: '12px 0' },
+    primaryBtn: {
+      background: t.primary,
+      color: '#fff',
+      border: 'none',
+      borderRadius: 6,
+      padding: '8px 20px',
+      cursor: 'pointer',
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 13,
+    },
+    secondaryBtn: {
+      background: t.hover,
+      border: `0.5px solid ${t.border}`,
+      borderRadius: 6,
+      padding: '8px 20px',
+      color: t.text,
+      cursor: 'pointer',
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 13,
+    },
+    error: { color: '#f64747', fontSize: 13, marginTop: 8, fontFamily: "'JetBrains Mono', monospace" },
+  };
 
   return (
     <div style={styles.container}>
@@ -106,7 +108,7 @@ export default function DevUrl() {
       <textarea
         style={{
           ...styles.textarea,
-          color: error ? '#f64747' : '#39D98A',
+          color: error ? '#f64747' : t.green,
         }}
         value={output}
         readOnly

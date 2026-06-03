@@ -1,74 +1,8 @@
 import React, { useState, useCallback } from 'react';
-
-const styles: Record<string, React.CSSProperties> = {
-  container: { padding: 20 },
-  input: {
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
-    borderRadius: 6,
-    padding: '8px 12px',
-    color: '#E0E0E8',
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 14,
-    width: 60,
-    textAlign: 'center',
-    outline: 'none',
-  },
-  primaryBtn: {
-    background: '#4F8EF7',
-    color: '#fff',
-    border: 'none',
-    borderRadius: 6,
-    padding: '8px 20px',
-    cursor: 'pointer',
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 13,
-  },
-  secondaryBtn: {
-    background: '#1A1A1F',
-    border: '0.5px solid #2a2a30',
-    borderRadius: 6,
-    padding: '8px 14px',
-    color: '#E0E0E8',
-    cursor: 'pointer',
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 13,
-  },
-  resultBox: {
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
-    borderRadius: 8,
-    padding: 16,
-    fontFamily: "'JetBrains Mono', monospace",
-    color: '#39D98A',
-    fontSize: 18,
-    wordBreak: 'break-all',
-    marginTop: 16,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  label: { color: '#888890', fontSize: 13, marginBottom: 6 },
-  row: { display: 'flex', gap: 10, alignItems: 'center', marginTop: 12 },
-  scrollList: {
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
-    borderRadius: 8,
-    padding: 16,
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 13,
-    color: '#39D98A',
-    maxHeight: 320,
-    overflowY: 'auto',
-    marginTop: 16,
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-all',
-    lineHeight: 1.8,
-  },
-  sectionTitle: { color: '#E0E0E8', fontSize: 15, fontWeight: 600, marginTop: 24 },
-};
+import { useTheme } from '../../theme';
 
 export default function DevUuid() {
+  const t = useTheme();
   const [singleUuid, setSingleUuid] = useState('');
   const [batchCount, setBatchCount] = useState(5);
   const [batchUuids, setBatchUuids] = useState<string[]>([]);
@@ -101,6 +35,74 @@ export default function DevUuid() {
     setCopied('all');
     setTimeout(() => setCopied(''), 1800);
   }, [batchUuids]);
+
+  const styles: Record<string, React.CSSProperties> = {
+    container: { padding: 20 },
+    input: {
+      background: t.inputBg,
+      border: `0.5px solid ${t.border}`,
+      borderRadius: 6,
+      padding: '8px 12px',
+      color: t.text,
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 14,
+      width: 60,
+      textAlign: 'center',
+      outline: 'none',
+    },
+    primaryBtn: {
+      background: t.primary,
+      color: '#fff',
+      border: 'none',
+      borderRadius: 6,
+      padding: '8px 20px',
+      cursor: 'pointer',
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 13,
+    },
+    secondaryBtn: {
+      background: t.hover,
+      border: `0.5px solid ${t.border}`,
+      borderRadius: 6,
+      padding: '8px 14px',
+      color: t.text,
+      cursor: 'pointer',
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 13,
+    },
+    resultBox: {
+      background: t.inputBg,
+      border: `0.5px solid ${t.border}`,
+      borderRadius: 8,
+      padding: 16,
+      fontFamily: "'JetBrains Mono', monospace",
+      color: t.green,
+      fontSize: 18,
+      wordBreak: 'break-all',
+      marginTop: 16,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    label: { color: t.textSecondary, fontSize: 13, marginBottom: 6 },
+    row: { display: 'flex', gap: 10, alignItems: 'center', marginTop: 12 },
+    scrollList: {
+      background: t.inputBg,
+      border: `0.5px solid ${t.border}`,
+      borderRadius: 8,
+      padding: 16,
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 13,
+      color: t.green,
+      maxHeight: 320,
+      overflowY: 'auto',
+      marginTop: 16,
+      whiteSpace: 'pre-wrap',
+      wordBreak: 'break-all',
+      lineHeight: 1.8,
+    },
+    sectionTitle: { color: t.text, fontSize: 15, fontWeight: 600, marginTop: 24 },
+  };
 
   return (
     <div style={styles.container}>
@@ -143,7 +145,7 @@ export default function DevUuid() {
           <div style={styles.scrollList}>
             {batchUuids.map((uuid, i) => (
               <div key={i}>
-                <span style={{ color: '#888890' }}>{String(i + 1).padStart(3, '0')}. </span>
+                <span style={{ color: t.textSecondary }}>{String(i + 1).padStart(3, '0')}. </span>
                 {uuid}
               </div>
             ))}

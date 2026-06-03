@@ -1,17 +1,18 @@
 import React, { useState, useMemo } from 'react';
+import { useTheme } from '../../theme';
 
-const styles: Record<string, React.CSSProperties> = {
+const makeStyles = (t: ReturnType<typeof useTheme>): Record<string, React.CSSProperties> => ({
   wrapper: {
     padding: 20,
   },
   textarea: {
     width: '100%',
     minHeight: 220,
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 6,
     padding: '8px 12px',
-    color: '#E0E0E8',
+    color: t.text,
     fontFamily: "'JetBrains Mono', monospace",
     fontSize: 13,
     lineHeight: 1.6,
@@ -20,7 +21,7 @@ const styles: Record<string, React.CSSProperties> = {
     boxSizing: 'border-box' as const,
   },
   label: {
-    color: '#888890',
+    color: t.textSecondary,
     fontSize: 13,
     fontWeight: 500,
     marginBottom: 6,
@@ -33,25 +34,25 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 16,
   },
   card: {
-    background: '#141418',
+    background: t.card,
     borderRadius: 8,
     padding: '12px 16px',
     display: 'flex',
     flexDirection: 'column' as const,
     gap: 4,
-    border: '0.5px solid #1A1A1F',
+    border: `0.5px solid ${t.hover}`,
   },
   cardValue: {
-    color: '#39D98A',
+    color: t.green,
     fontSize: 24,
     fontWeight: 700,
     fontFamily: "'JetBrains Mono', monospace",
   },
   cardLabel: {
-    color: '#888890',
+    color: t.textSecondary,
     fontSize: 12,
   },
-};
+});
 
 interface Stats {
   charsWithSpaces: number;
@@ -84,6 +85,9 @@ function computeStats(text: string): Stats {
 }
 
 const TextWordcount: React.FC = () => {
+  const t = useTheme();
+  const styles = useMemo(() => makeStyles(t), [t]);
+
   const [text, setText] = useState('');
 
   const stats = useMemo(() => computeStats(text), [text]);

@@ -1,45 +1,46 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useTheme } from '../../theme';
 
-const styles: Record<string, React.CSSProperties> = {
+const makeStyles = (t: ReturnType<typeof useTheme>): Record<string, React.CSSProperties> => ({
   container: {
     padding: 20,
     fontFamily: "'JetBrains Mono', monospace",
-    color: '#E0E0E8',
-    background: '#0F0F11',
+    color: t.text,
+    background: t.bg,
     minHeight: '100%',
   },
   section: {
-    background: '#141418',
+    background: t.card,
     borderRadius: 8,
     padding: 20,
     marginBottom: 20,
   },
   sectionHeader: {
-    color: '#a78bfa',
+    color: t.purple,
     fontSize: 15,
     fontWeight: 600,
     marginBottom: 16,
   },
   label: {
-    color: '#888890',
+    color: t.textSecondary,
     fontSize: 13,
     marginBottom: 6,
     display: 'block',
   },
   input: {
     width: '100%',
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 6,
     padding: '8px 12px',
-    color: '#E0E0E8',
+    color: t.text,
     fontFamily: "'JetBrains Mono', monospace",
     fontSize: 14,
     boxSizing: 'border-box' as const,
     outline: 'none',
   },
   button: {
-    background: '#4F8EF7',
+    background: t.primary,
     color: '#fff',
     border: 'none',
     borderRadius: 6,
@@ -49,17 +50,17 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "'JetBrains Mono', monospace",
   },
   result: {
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 8,
     padding: 16,
     fontFamily: "'JetBrains Mono', monospace",
-    color: '#39D98A',
+    color: t.green,
     fontSize: 14,
     wordBreak: 'break-all',
   },
   largeTimestamp: {
-    color: '#39D98A',
+    color: t.green,
     fontSize: 32,
     fontWeight: 700,
     fontFamily: "'JetBrains Mono', monospace",
@@ -70,13 +71,16 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 16,
   },
   hint: {
-    color: '#55555F',
+    color: t.textHint,
     fontSize: 12,
     marginTop: 8,
   },
-};
+});
 
 export default function TimeTimestamp() {
+  const t = useTheme();
+  const styles = useMemo(() => makeStyles(t), [t]);
+
   const [timestampInput, setTimestampInput] = useState('');
   const [datetimeInput, setDatetimeInput] = useState('');
   const [currentTimestamp, setCurrentTimestamp] = useState<number | null>(null);

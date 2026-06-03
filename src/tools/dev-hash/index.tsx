@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useTheme } from '../../theme';
 
 /* ---------- Pure-JS MD5 implementation ---------- */
 function md5(input: string): string {
@@ -130,65 +131,8 @@ async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-/* ---------- Styles ---------- */
-const s: Record<string, React.CSSProperties> = {
-  container: { padding: 20 },
-  textarea: {
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
-    borderRadius: 6,
-    padding: '8px 12px',
-    color: '#E0E0E8',
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 14,
-    width: '100%',
-    minHeight: 120,
-    resize: 'vertical',
-    boxSizing: 'border-box',
-    outline: 'none',
-    lineHeight: 1.6,
-  },
-  resultRow: {
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
-    borderRadius: 8,
-    padding: 12,
-    marginTop: 10,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  label: { color: '#888890', fontSize: 13, marginBottom: 6 },
-  hashLabel: {
-    color: '#888890',
-    fontSize: 13,
-    fontFamily: "'JetBrains Mono', monospace",
-    minWidth: 70,
-    flexShrink: 0,
-  },
-  hashValue: {
-    color: '#39D98A',
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 13,
-    wordBreak: 'break-all',
-    flex: 1,
-  },
-  copyBtn: {
-    background: '#1A1A1F',
-    border: '0.5px solid #2a2a30',
-    borderRadius: 6,
-    padding: '4px 12px',
-    color: '#E0E0E8',
-    cursor: 'pointer',
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 12,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-  },
-};
-
 export default function DevHash() {
+  const t = useTheme();
   const [input, setInput] = useState('Hello, World!');
   const [md5Hash, setMd5Hash] = useState('');
   const [sha1Hash, setSha1Hash] = useState('');
@@ -221,6 +165,63 @@ export default function DevHash() {
     setCopied(label);
     setTimeout(() => setCopied(''), 1800);
   }, []);
+
+  const s: Record<string, React.CSSProperties> = {
+    container: { padding: 20 },
+    textarea: {
+      background: t.inputBg,
+      border: `0.5px solid ${t.border}`,
+      borderRadius: 6,
+      padding: '8px 12px',
+      color: t.text,
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 14,
+      width: '100%',
+      minHeight: 120,
+      resize: 'vertical',
+      boxSizing: 'border-box',
+      outline: 'none',
+      lineHeight: 1.6,
+    },
+    resultRow: {
+      background: t.inputBg,
+      border: `0.5px solid ${t.border}`,
+      borderRadius: 8,
+      padding: 12,
+      marginTop: 10,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+    },
+    label: { color: t.textSecondary, fontSize: 13, marginBottom: 6 },
+    hashLabel: {
+      color: t.textSecondary,
+      fontSize: 13,
+      fontFamily: "'JetBrains Mono', monospace",
+      minWidth: 70,
+      flexShrink: 0,
+    },
+    hashValue: {
+      color: t.green,
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 13,
+      wordBreak: 'break-all',
+      flex: 1,
+    },
+    copyBtn: {
+      background: t.hover,
+      border: `0.5px solid ${t.border}`,
+      borderRadius: 6,
+      padding: '4px 12px',
+      color: t.text,
+      cursor: 'pointer',
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 12,
+      flexShrink: 0,
+      whiteSpace: 'nowrap',
+    },
+  };
 
   return (
     <div style={s.container}>

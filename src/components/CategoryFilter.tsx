@@ -1,4 +1,5 @@
 import { categories } from '../registry';
+import { useTheme } from '../theme';
 
 interface CategoryFilterProps {
   active: string;
@@ -6,6 +7,8 @@ interface CategoryFilterProps {
 }
 
 export default function CategoryFilter({ active, onChange }: CategoryFilterProps) {
+  const t = useTheme();
+
   return (
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
       {categories.map((cat) => {
@@ -17,9 +20,9 @@ export default function CategoryFilter({ active, onChange }: CategoryFilterProps
             style={{
               padding: '6px 16px',
               borderRadius: 20,
-              border: isActive ? 'none' : '0.5px solid #2a2a30',
-              background: isActive ? '#4F8EF7' : '#141418',
-              color: isActive ? '#fff' : '#888890',
+              border: isActive ? 'none' : `0.5px solid ${t.border}`,
+              background: isActive ? t.primary : t.card,
+              color: isActive ? '#fff' : t.textSecondary,
               cursor: 'pointer',
               fontSize: 13,
               fontFamily: "'Noto Sans SC', sans-serif",
@@ -27,12 +30,12 @@ export default function CategoryFilter({ active, onChange }: CategoryFilterProps
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = '#3a3a48';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = t.borderHover;
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = '#2a2a30';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = t.border;
               }
             }}
           >

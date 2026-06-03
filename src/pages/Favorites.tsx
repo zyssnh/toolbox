@@ -2,10 +2,12 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { toolMetas } from '../registry';
 import { useAppStore } from '../store/useAppStore';
+import { useTheme } from '../theme';
 import ToolGrid from '../components/ToolGrid';
 
 export default function Favorites() {
   const favorites = useAppStore((s) => s.favorites);
+  const t = useTheme();
 
   const favoritedTools = useMemo(() => {
     const favSet = new Set(favorites);
@@ -18,7 +20,7 @@ export default function Favorites() {
         style={{
           fontSize: 24,
           fontWeight: 600,
-          color: '#E0E0E8',
+          color: t.text,
           marginBottom: 24,
         }}
       >
@@ -33,10 +35,10 @@ export default function Favorites() {
           }}
         >
           <div style={{ fontSize: 48, marginBottom: 16 }}>📦</div>
-          <div style={{ color: '#E0E0E8', fontSize: 16, marginBottom: 8 }}>
+          <div style={{ color: t.text, fontSize: 16, marginBottom: 8 }}>
             还没有收藏任何工具
           </div>
-          <div style={{ color: '#888890', fontSize: 14, marginBottom: 24 }}>
+          <div style={{ color: t.textSecondary, fontSize: 14, marginBottom: 24 }}>
             去首页看看吧～
           </div>
           <Link
@@ -44,7 +46,7 @@ export default function Favorites() {
             style={{
               display: 'inline-block',
               color: '#fff',
-              background: '#4F8EF7',
+              background: t.primary,
               borderRadius: 20,
               padding: '8px 24px',
               fontSize: 14,

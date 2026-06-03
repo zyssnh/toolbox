@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../theme';
 
 /* ---------- Color helpers ---------- */
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
@@ -57,38 +58,8 @@ function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: n
   return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
 }
 
-/* ---------- Styles ---------- */
-const st: Record<string, React.CSSProperties> = {
-  container: { padding: 20 },
-  section: { marginBottom: 20 },
-  label: { color: '#888890', fontSize: 13, marginBottom: 6 },
-  inputRow: { display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' },
-  input: {
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
-    borderRadius: 6,
-    padding: '8px 12px',
-    color: '#E0E0E8',
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 14,
-    outline: 'none',
-  },
-  hexInput: { width: 140 },
-  rgbInput: { width: 64 },
-  hslInput: { width: 70 },
-  inputHint: { color: '#888890', fontSize: 12, fontFamily: "'JetBrains Mono', monospace" },
-  preview: {
-    borderRadius: 8,
-    marginTop: 16,
-    height: 140,
-    width: '100%',
-    border: '0.5px solid #2a2a30',
-    transition: 'background 0.2s',
-  },
-  error: { color: '#f59e0b', fontSize: 12, marginTop: 4 },
-};
-
 export default function DevColor() {
+  const t = useTheme();
   // HEX
   const [hex, setHex] = useState('#4F8EF7');
   // RGB
@@ -133,6 +104,36 @@ export default function DevColor() {
   const clampNum = (v: number, min: number, max: number) =>
     isNaN(v) ? min : Math.max(min, Math.min(max, v));
 
+  const st: Record<string, React.CSSProperties> = {
+    container: { padding: 20 },
+    section: { marginBottom: 20 },
+    label: { color: t.textSecondary, fontSize: 13, marginBottom: 6 },
+    inputRow: { display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' },
+    input: {
+      background: t.inputBg,
+      border: `0.5px solid ${t.border}`,
+      borderRadius: 6,
+      padding: '8px 12px',
+      color: t.text,
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 14,
+      outline: 'none',
+    },
+    hexInput: { width: 140 },
+    rgbInput: { width: 64 },
+    hslInput: { width: 70 },
+    inputHint: { color: t.textSecondary, fontSize: 12, fontFamily: "'JetBrains Mono', monospace" },
+    preview: {
+      borderRadius: 8,
+      marginTop: 16,
+      height: 140,
+      width: '100%',
+      border: `0.5px solid ${t.border}`,
+      transition: 'background 0.2s',
+    },
+    error: { color: t.yellow, fontSize: 12, marginTop: 4 },
+  };
+
   return (
     <div style={st.container}>
       {/* HEX Input */}
@@ -152,7 +153,7 @@ export default function DevColor() {
               setActiveSource('hex');
             }}
           />
-          <span style={{ ...st.inputHint, color: hexToRgb(hex) ? '#39D98A' : '#f59e0b' }}>
+          <span style={{ ...st.inputHint, color: hexToRgb(hex) ? t.green : t.yellow }}>
             {hexToRgb(hex) ? '✓' : hex.length >= 7 ? '✗' : ''}
           </span>
         </div>
@@ -226,7 +227,7 @@ export default function DevColor() {
       <div
         style={{
           ...st.preview,
-          background: hexToRgb(hex) ? hex : '#141418',
+          background: hexToRgb(hex) ? hex : t.card,
         }}
       />
     </div>

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTheme } from '../../theme';
 
 interface DateDiff {
   years: number;
@@ -45,33 +46,33 @@ function formatDateCN(date: Date): string {
   return `${y}年${m}月${d}日`;
 }
 
-const styles: Record<string, React.CSSProperties> = {
+const makeStyles = (t: ReturnType<typeof useTheme>): Record<string, React.CSSProperties> => ({
   container: {
     padding: 20,
     fontFamily: "'JetBrains Mono', monospace",
-    color: '#E0E0E8',
-    background: '#0F0F11',
+    color: t.text,
+    background: t.bg,
     minHeight: '100%',
   },
   section: {
-    background: '#141418',
+    background: t.card,
     borderRadius: 8,
     padding: 20,
     marginBottom: 20,
   },
   label: {
-    color: '#888890',
+    color: t.textSecondary,
     fontSize: 13,
     marginBottom: 6,
     display: 'block',
   },
   input: {
     width: '100%',
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 6,
     padding: '8px 12px',
-    color: '#E0E0E8',
+    color: t.text,
     fontFamily: "'JetBrains Mono', monospace",
     fontSize: 14,
     boxSizing: 'border-box' as const,
@@ -81,8 +82,8 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 16,
   },
   resultCard: {
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 8,
     padding: 20,
   },
@@ -91,49 +92,52 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '10px 0',
-    borderBottom: '0.5px solid #1a1a20',
+    borderBottom: `0.5px solid ${t.border}`,
   },
   resultLabel: {
-    color: '#888890',
+    color: t.textSecondary,
     fontSize: 14,
   },
   resultValue: {
-    color: '#39D98A',
+    color: t.green,
     fontSize: 18,
     fontWeight: 700,
     fontFamily: "'JetBrains Mono', monospace",
   },
   resultTitle: {
-    color: '#a78bfa',
+    color: t.purple,
     fontSize: 15,
     fontWeight: 600,
     marginBottom: 16,
   },
   hint: {
-    color: '#55555F',
+    color: t.textHint,
     fontSize: 14,
     textAlign: 'center' as const,
     padding: '40px 0',
   },
   sameDate: {
-    color: '#39D98A',
+    color: t.green,
     fontSize: 16,
     textAlign: 'center' as const,
     padding: '20px 0',
   },
   swapHint: {
-    color: '#55555F',
+    color: t.textHint,
     fontSize: 11,
     marginTop: 8,
   },
   dateLabel: {
-    color: '#888890',
+    color: t.textSecondary,
     fontSize: 12,
     marginTop: 4,
   },
-};
+});
 
 export default function TimeDiff() {
+  const t = useTheme();
+  const styles = useMemo(() => makeStyles(t), [t]);
+
   const [date1, setDate1] = useState('');
   const [date2, setDate2] = useState('');
 
@@ -205,7 +209,7 @@ export default function TimeDiff() {
         <div style={styles.section}>
           <div style={styles.resultTitle}>
             日期差值
-            {isReversed && <span style={{ color: '#888890', fontSize: 12, marginLeft: 8 }}>(已自动交换顺序)</span>}
+            {isReversed && <span style={{ color: t.textSecondary, fontSize: 12, marginLeft: 8 }}>(已自动交换顺序)</span>}
           </div>
           <div style={styles.resultCard}>
             <div style={styles.resultRow}>

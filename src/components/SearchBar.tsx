@@ -1,9 +1,13 @@
+import { useTheme } from '../theme';
+
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
 }
 
 export default function SearchBar({ value, onChange }: SearchBarProps) {
+  const t = useTheme();
+
   return (
     <div style={{ position: 'relative', width: 300 }}>
       <span
@@ -13,7 +17,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
           top: '50%',
           transform: 'translateY(-50%)',
           fontSize: 14,
-          color: '#55555F',
+          color: t.textHint,
           pointerEvents: 'none',
         }}
       >
@@ -26,11 +30,11 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         placeholder="搜索工具..."
         style={{
           width: '100%',
-          background: '#0F0F11',
-          border: '0.5px solid #2a2a30',
+          background: t.inputBg,
+          border: `0.5px solid ${t.border}`,
           borderRadius: 20,
           padding: '8px 16px 8px 36px',
-          color: '#E0E0E8',
+          color: t.text,
           fontSize: 14,
           outline: 'none',
           fontFamily: "'Noto Sans SC', sans-serif",
@@ -38,10 +42,10 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
           transition: 'border-color 0.2s',
         }}
         onFocus={(e) => {
-          e.currentTarget.style.borderColor = '#4F8EF7';
+          e.currentTarget.style.borderColor = t.primary;
         }}
         onBlur={(e) => {
-          e.currentTarget.style.borderColor = '#2a2a30';
+          e.currentTarget.style.borderColor = t.border;
         }}
       />
     </div>

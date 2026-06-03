@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useTheme } from '../../theme';
 
 interface Cell {
   isMine: boolean;
@@ -128,6 +129,8 @@ function checkWin(board: Cell[][]): boolean {
 }
 
 const GameMinesweeper: React.FC = () => {
+  const t = useTheme();
+
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [board, setBoard] = useState<Cell[][]>(() => createEmptyBoard(9, 9));
   const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
@@ -232,9 +235,9 @@ const GameMinesweeper: React.FC = () => {
   const styles = {
     wrapper: {
       padding: 20,
-      background: '#0F0F11',
+      background: t.bg,
       minHeight: '100%',
-      color: '#E0E0E8',
+      color: t.text,
       display: 'flex',
       flexDirection: 'column' as const,
       alignItems: 'center',
@@ -248,7 +251,7 @@ const GameMinesweeper: React.FC = () => {
     title: {
       fontSize: 24,
       fontWeight: 700,
-      color: '#E0E0E8',
+      color: t.text,
       textAlign: 'center' as const,
       marginBottom: 12,
     },
@@ -265,8 +268,8 @@ const GameMinesweeper: React.FC = () => {
       gap: 6,
     },
     diffBtn: (active: boolean) => ({
-      background: active ? '#4F8EF7' : '#141418',
-      color: active ? 'white' : '#888890',
+      background: active ? t.primary : t.card,
+      color: active ? 'white' : t.textSecondary,
       border: 'none',
       borderRadius: 6,
       padding: '6px 14px',
@@ -283,24 +286,24 @@ const GameMinesweeper: React.FC = () => {
       maxWidth: config.cols * 34 + 8,
     },
     infoBox: {
-      background: '#141418',
+      background: t.card,
       borderRadius: 6,
       padding: '6px 14px',
     },
     infoLabel: {
       fontSize: 10,
-      color: '#888890',
+      color: t.textSecondary,
     },
     infoValue: {
       fontSize: 18,
       fontWeight: 700,
-      color: '#E0E0E8',
+      color: t.text,
     },
     grid: {
       display: 'grid',
       gridTemplateColumns: `repeat(${config.cols}, 32px)`,
       gap: 2,
-      background: '#0F0F11',
+      background: t.bg,
       userSelect: 'none' as const,
     },
     cell: (cell: Cell) => {
@@ -326,7 +329,7 @@ const GameMinesweeper: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#1A1A1F',
+          background: t.hover,
           borderRadius: 3,
           fontSize: 15,
           fontWeight: 600,
@@ -347,11 +350,11 @@ const GameMinesweeper: React.FC = () => {
         borderRight: '2px solid #2a2a30',
         cursor: 'pointer',
         fontSize: 14,
-        color: '#E0E0E8',
+        color: t.text,
       };
     },
     button: {
-      background: '#4F8EF7',
+      background: t.primary,
       color: 'white',
       border: 'none',
       borderRadius: 6,
@@ -369,7 +372,7 @@ const GameMinesweeper: React.FC = () => {
       marginTop: 8,
     },
     winText: {
-      color: '#39D98A',
+      color: t.green,
       fontSize: 18,
       fontWeight: 700,
       textAlign: 'center' as const,

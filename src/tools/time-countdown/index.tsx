@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTheme } from '../../theme';
 
 interface TimeRemaining {
   days: number;
@@ -21,33 +22,33 @@ function calcRemaining(target: Date, now: Date): TimeRemaining {
   return { days, hours, minutes, seconds, total };
 }
 
-const styles: Record<string, React.CSSProperties> = {
+const makeStyles = (t: ReturnType<typeof useTheme>): Record<string, React.CSSProperties> => ({
   container: {
     padding: 20,
     fontFamily: "'JetBrains Mono', monospace",
-    color: '#E0E0E8',
-    background: '#0F0F11',
+    color: t.text,
+    background: t.bg,
     minHeight: '100%',
   },
   section: {
-    background: '#141418',
+    background: t.card,
     borderRadius: 8,
     padding: 20,
     marginBottom: 20,
   },
   label: {
-    color: '#888890',
+    color: t.textSecondary,
     fontSize: 13,
     marginBottom: 6,
     display: 'block',
   },
   input: {
     width: '100%',
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 6,
     padding: '8px 12px',
-    color: '#E0E0E8',
+    color: t.text,
     fontFamily: "'JetBrains Mono', monospace",
     fontSize: 14,
     boxSizing: 'border-box' as const,
@@ -63,8 +64,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   timeCard: {
     flex: 1,
-    background: '#0F0F11',
-    border: '0.5px solid #2a2a30',
+    background: t.inputBg,
+    border: `0.5px solid ${t.border}`,
     borderRadius: 8,
     padding: '16px 8px',
     textAlign: 'center' as const,
@@ -72,38 +73,41 @@ const styles: Record<string, React.CSSProperties> = {
   timeNumber: {
     fontSize: 36,
     fontWeight: 700,
-    color: '#39D98A',
+    color: t.green,
     fontFamily: "'JetBrains Mono', monospace",
     lineHeight: 1.2,
   },
   timeLabel: {
     fontSize: 13,
-    color: '#888890',
+    color: t.textSecondary,
     marginTop: 4,
   },
   hint: {
-    color: '#55555F',
+    color: t.textHint,
     fontSize: 14,
     textAlign: 'center' as const,
     padding: '40px 0',
   },
   finished: {
-    color: '#39D98A',
+    color: t.green,
     fontSize: 24,
     fontWeight: 700,
     textAlign: 'center' as const,
     padding: '40px 0',
   },
   titleDisplay: {
-    color: '#a78bfa',
+    color: t.purple,
     fontSize: 18,
     fontWeight: 600,
     textAlign: 'center' as const,
     marginBottom: 4,
   },
-};
+});
 
 export default function TimeCountdown() {
+  const t = useTheme();
+  const styles = useMemo(() => makeStyles(t), [t]);
+
   const [targetDate, setTargetDate] = useState('');
   const [title, setTitle] = useState('');
   const [now, setNow] = useState(new Date());

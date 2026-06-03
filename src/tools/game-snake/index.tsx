@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useTheme } from '../../theme';
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 18;
@@ -31,6 +32,8 @@ function getInitialSnake(): Position[] {
 }
 
 const GameSnake: React.FC = () => {
+  const t = useTheme();
+
   const [snake, setSnake] = useState<Position[]>(getInitialSnake);
   const [food, setFood] = useState<Position>(() => newFood(getInitialSnake()));
   const [direction, setDirection] = useState<{ x: number; y: number }>({ x: 1, y: 0 });
@@ -172,9 +175,9 @@ const GameSnake: React.FC = () => {
   const styles = {
     wrapper: {
       padding: 20,
-      background: '#0F0F11',
+      background: t.bg,
       minHeight: '100%',
-      color: '#E0E0E8',
+      color: t.text,
       display: 'flex',
       flexDirection: 'column' as const,
       alignItems: 'center',
@@ -191,38 +194,38 @@ const GameSnake: React.FC = () => {
     title: {
       fontSize: 24,
       fontWeight: 700,
-      color: '#E0E0E8',
+      color: t.text,
     },
     scores: {
       display: 'flex',
       gap: 16,
     },
     scoreBox: {
-      background: '#141418',
+      background: t.card,
       borderRadius: 8,
       padding: '6px 16px',
       textAlign: 'center' as const,
     },
     scoreLabel: {
       fontSize: 10,
-      color: '#888890',
+      color: t.textSecondary,
       textTransform: 'uppercase' as const,
     },
     scoreValue: {
       fontSize: 20,
       fontWeight: 700,
-      color: '#39D98A',
+      color: t.green,
     },
     highScoreValue: {
       fontSize: 20,
       fontWeight: 700,
-      color: '#ec4899',
+      color: t.pink,
     },
     canvas: {
       position: 'relative' as const,
       width: CANVAS,
       height: CANVAS,
-      background: '#141418',
+      background: t.card,
       borderRadius: 8,
       overflow: 'hidden',
     },
@@ -233,7 +236,7 @@ const GameSnake: React.FC = () => {
       borderRadius: 3,
     },
     button: {
-      background: '#4F8EF7',
+      background: t.primary,
       color: 'white',
       border: 'none',
       borderRadius: 6,
@@ -249,7 +252,7 @@ const GameSnake: React.FC = () => {
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(15, 15, 17, 0.85)',
+      background: t.card,
       display: 'flex',
       flexDirection: 'column' as const,
       alignItems: 'center',
@@ -258,13 +261,13 @@ const GameSnake: React.FC = () => {
       zIndex: 10,
     },
     overlayText: {
-      color: '#E0E0E8',
+      color: t.text,
       fontSize: 24,
       fontWeight: 700,
       marginBottom: 8,
     },
     overlaySub: {
-      color: '#888890',
+      color: t.textSecondary,
       fontSize: 14,
     },
   };
@@ -306,7 +309,7 @@ const GameSnake: React.FC = () => {
                   ? '#ff6b6b'
                   : head && head.x === x && head.y === y
                   ? '#2ecc71'
-                  : '#39D98A',
+                  : t.green,
                 boxShadow:
                   head && head.x === x && head.y === y
                     ? '0 0 6px rgba(46, 204, 113, 0.5)'
