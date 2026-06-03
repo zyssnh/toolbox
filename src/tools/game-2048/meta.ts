@@ -1,0 +1,1 @@
+export { toolMetas } from '../../registry';
