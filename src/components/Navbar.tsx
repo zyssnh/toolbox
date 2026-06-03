@@ -70,7 +70,9 @@ export default function Navbar() {
       </button>
 
       <a
-        href="/toolbox/docs/"
+        href="https://zyssnh.github.io/docstools/"
+        target="_blank"
+        rel="noopener noreferrer"
         style={{
           textDecoration: 'none',
           color: t.textSecondary,
