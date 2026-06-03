@@ -69,6 +69,18 @@ export default function Navbar() {
         {mode === 'dark' ? '☀️' : '🌙'}
       </button>
 
+      <a
+        href="/toolbox/docs/"
+        style={{
+          textDecoration: 'none',
+          color: t.textSecondary,
+          fontSize: 14,
+          flexShrink: 0,
+        }}
+      >
+        📖 文档
+      </a>
+
       <Link
         to="/#/favorites"
         style={{
