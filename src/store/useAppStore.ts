@@ -7,9 +7,11 @@ interface AppStore {
   favorites: string[];
   recentTools: string[];
   theme: ThemeMode;
+  sudokuTheme: string;
   toggleFavorite: (id: string) => void;
   addRecent: (id: string) => void;
   toggleTheme: () => void;
+  setSudokuTheme: (id: string) => void;
 }
 
 export const useAppStore = create<AppStore>()(
@@ -18,6 +20,7 @@ export const useAppStore = create<AppStore>()(
       favorites: [],
       recentTools: [],
       theme: 'dark',
+      sudokuTheme: 'glassmorphism',
       toggleFavorite: (id) => {
         const favs = get().favorites;
         set({ favorites: favs.includes(id) ? favs.filter(f => f !== id) : [id, ...favs] });
@@ -28,6 +31,9 @@ export const useAppStore = create<AppStore>()(
       },
       toggleTheme: () => {
         set({ theme: get().theme === 'dark' ? 'light' : 'dark' });
+      },
+      setSudokuTheme: (id) => {
+        set({ sudokuTheme: id });
       },
     }),
     { name: 'toolbox-store' }

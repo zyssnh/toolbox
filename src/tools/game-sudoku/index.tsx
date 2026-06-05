@@ -1,184 +1,14 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTheme } from '../../theme';
-
-type Difficulty = 'easy' | 'medium' | 'hard';
-
-const DIFFICULTY_REMOVE: Record<Difficulty, number> = {
-  easy: 30,
-  medium: 45,
-  hard: 55,
-};
-
-const SIZE = 9;
-const BOX_SIZE = 3;
-
-type Board = number[][]; // 0 = empty
-type FixedBoard = boolean[][]; // true = given cell (immutable)
-
-function createEmptyBoard(): Board {
-  return Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
-}
-
-function cloneBoard(board: Board): Board {
-  return board.map((row) => [...row]);
-}
-
-function isValidPlacement(board: Board, row: number, col: number, num: number): boolean {
-  // Check row
-  for (let c = 0; c < SIZE; c++) {
-    if (board[row][c] === num) return false;
-  }
-  // Check column
-  for (let r = 0; r < SIZE; r++) {
-    if (board[r][col] === num) return false;
-  }
-  // Check box
-  const boxR = Math.floor(row / BOX_SIZE) * BOX_SIZE;
-  const boxC = Math.floor(col / BOX_SIZE) * BOX_SIZE;
-  for (let r = boxR; r < boxR + BOX_SIZE; r++) {
-    for (let c = boxC; c < boxC + BOX_SIZE; c++) {
-      if (board[r][c] === num) return false;
-    }
-  }
-  return true;
-}
-
-
-function solveHelper(board: Board): boolean {
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
-      if (board[r][c] === 0) {
-        const nums = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-        for (const num of nums) {
-          if (isValidPlacement(board, r, c, num)) {
-            board[r][c] = num;
-            if (solveHelper(board)) return true;
-            board[r][c] = 0;
-          }
-        }
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function generatePuzzle(difficulty: Difficulty): { puzzle: Board; solution: Board; fixedCells: FixedBoard } {
-  const board = createEmptyBoard();
-  solveHelper(board);
-
-  const solution = cloneBoard(board);
-  const puzzle = cloneBoard(board);
-  const removeCount = DIFFICULTY_REMOVE[difficulty];
-
-  // Create list of all positions and shuffle
-  const positions: [number, number][] = [];
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
-      positions.push([r, c]);
-    }
-  }
-  const shuffled = shuffle(positions);
-
-  let removed = 0;
-  for (const [r, c] of shuffled) {
-    if (removed >= removeCount) break;
-    const backup = puzzle[r][c];
-    puzzle[r][c] = 0;
-
-    // Check that the puzzle still has a unique solution by trying to solve
-    // For simplicity, just ensure the removed cell doesn't make it unsolvable
-    const testBoard = cloneBoard(puzzle);
-    if (solveHelper(testBoard)) {
-      // Check uniqueness: try solving with a different number first
-      let solutions = 0;
-      const testUniq = cloneBoard(puzzle);
-      countSolutions(testUniq, () => {
-        solutions++;
-        return solutions >= 2;
-      });
-      if (solutions === 1) {
-        removed++;
-        continue;
-      }
-    }
-    puzzle[r][c] = backup;
-  }
-
-  const fixedCells: FixedBoard = puzzle.map((row) => row.map((v) => v !== 0));
-
-  return { puzzle, solution, fixedCells };
-}
-
-function countSolutions(board: Board, stopEarly: () => boolean): void {
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
-      if (board[r][c] === 0) {
-        for (let num = 1; num <= 9; num++) {
-          if (isValidPlacement(board, r, c, num)) {
-            board[r][c] = num;
-            countSolutions(board, stopEarly);
-            if (stopEarly()) return;
-            board[r][c] = 0;
-          }
-        }
-        return;
-      }
-    }
-  }
-  // Found a complete solution
-  stopEarly();
-}
-
-function hasConflicts(board: Board, row: number, col: number, num: number): boolean {
-  if (num === 0) return false;
-  // Check row
-  for (let c = 0; c < SIZE; c++) {
-    if (c !== col && board[row][c] === num) return true;
-  }
-  // Check column
-  for (let r = 0; r < SIZE; r++) {
-    if (r !== row && board[r][col] === num) return true;
-  }
-  // Check box
-  const boxR = Math.floor(row / BOX_SIZE) * BOX_SIZE;
-  const boxC = Math.floor(col / BOX_SIZE) * BOX_SIZE;
-  for (let r = boxR; r < boxR + BOX_SIZE; r++) {
-    for (let c = boxC; c < boxC + BOX_SIZE; c++) {
-      if ((r !== row || c !== col) && board[r][c] === num) return true;
-    }
-  }
-  return false;
-}
-
-function isBoardComplete(board: Board): boolean {
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
-      if (board[r][c] === 0) return false;
-    }
-  }
-  return true;
-}
-
-function isBoardValid(board: Board): boolean {
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
-      const num = board[r][c];
-      if (num === 0) continue;
-      if (hasConflicts(board, r, c, num)) return false;
-    }
-  }
-  return true;
-}
+import type { Difficulty, Board, FixedBoard } from './types';
+import { SIZE, BOX_SIZE, DIFFICULTY_LABELS } from './types';
+import {
+  createEmptyBoard,
+  generatePuzzle,
+  hasConflicts,
+  isBoardComplete,
+  isBoardValid,
+} from './logic';
 
 const GameSudoku: React.FC = () => {
   const t = useTheme();
@@ -186,45 +16,54 @@ const GameSudoku: React.FC = () => {
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [board, setBoard] = useState<Board>(() => createEmptyBoard());
   const [fixedCells, setFixedCells] = useState<FixedBoard>(() =>
-    Array.from({ length: SIZE }, () => Array(SIZE).fill(false))
+    Array.from({ length: SIZE }, () => Array(SIZE).fill(false)),
   );
   const [selected, setSelected] = useState<{ r: number; c: number } | null>(null);
   const [gameComplete, setGameComplete] = useState(false);
   const [checkResult, setCheckResult] = useState<'correct' | 'wrong' | null>(null);
 
-  const newGame = useCallback((diff?: Difficulty) => {
-    const d = diff || difficulty;
-    setDifficulty(d);
-    const { puzzle: p, fixedCells: f } = generatePuzzle(d);
-    setBoard(p.map((row) => [...row]));
-    setFixedCells(f);
-    setSelected(null);
-    setGameComplete(false);
-    setCheckResult(null);
-  }, [difficulty]);
+  const newGame = useCallback(
+    (diff?: Difficulty) => {
+      const d = diff || difficulty;
+      setDifficulty(d);
+      const { puzzle: p, fixedCells: f } = generatePuzzle(d);
+      setBoard(p.map((row) => [...row]));
+      setFixedCells(f);
+      setSelected(null);
+      setGameComplete(false);
+      setCheckResult(null);
+    },
+    [difficulty],
+  );
 
   // Initialize on mount
   useEffect(() => {
     newGame();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleCellClick = useCallback((r: number, c: number) => {
-    if (gameComplete) return;
-    setSelected({ r, c });
-  }, [gameComplete]);
+  const handleCellClick = useCallback(
+    (r: number, c: number) => {
+      if (gameComplete) return;
+      setSelected({ r, c });
+    },
+    [gameComplete],
+  );
 
-  const placeNumber = useCallback((num: number) => {
-    if (!selected || gameComplete) return;
-    const { r, c } = selected;
-    if (fixedCells[r][c]) return;
+  const placeNumber = useCallback(
+    (num: number) => {
+      if (!selected || gameComplete) return;
+      const { r, c } = selected;
+      if (fixedCells[r][c]) return;
 
-    setBoard((prev) => {
-      const newBoard = prev.map((row) => [...row]);
-      newBoard[r][c] = prev[r][c] === num ? 0 : num;
-      return newBoard;
-    });
-    setCheckResult(null);
-  }, [selected, fixedCells, gameComplete]);
+      setBoard((prev) => {
+        const newBoard = prev.map((row) => [...row]);
+        newBoard[r][c] = prev[r][c] === num ? 0 : num;
+        return newBoard;
+      });
+      setCheckResult(null);
+    },
+    [selected, fixedCells, gameComplete],
+  );
 
   // Check for completion after each board update
   useEffect(() => {
@@ -254,7 +93,12 @@ const GameSudoku: React.FC = () => {
         placeNumber(num);
       } else if (e.key === 'Backspace' || e.key === 'Delete') {
         placeNumber(0);
-      } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      } else if (
+        e.key === 'ArrowUp' ||
+        e.key === 'ArrowDown' ||
+        e.key === 'ArrowLeft' ||
+        e.key === 'ArrowRight'
+      ) {
         e.preventDefault();
         setSelected((prev) => {
           if (!prev) {
@@ -262,10 +106,18 @@ const GameSudoku: React.FC = () => {
           }
           let { r, c } = prev;
           switch (e.key) {
-            case 'ArrowUp': r = Math.max(0, r - 1); break;
-            case 'ArrowDown': r = Math.min(8, r + 1); break;
-            case 'ArrowLeft': c = Math.max(0, c - 1); break;
-            case 'ArrowRight': c = Math.min(8, c + 1); break;
+            case 'ArrowUp':
+              r = Math.max(0, r - 1);
+              break;
+            case 'ArrowDown':
+              r = Math.min(8, r + 1);
+              break;
+            case 'ArrowLeft':
+              c = Math.max(0, c - 1);
+              break;
+            case 'ArrowRight':
+              c = Math.min(8, c + 1);
+              break;
           }
           return { r, c };
         });
@@ -348,7 +200,8 @@ const GameSudoku: React.FC = () => {
       const isBoxBorderC = c % BOX_SIZE === BOX_SIZE - 1 && c < SIZE - 1;
       const isSameRow = selected?.r === r;
       const isSameCol = selected?.c === c;
-      const isSameBox = selected != null &&
+      const isSameBox =
+        selected != null &&
         Math.floor(r / BOX_SIZE) === Math.floor(selected.r / BOX_SIZE) &&
         Math.floor(c / BOX_SIZE) === Math.floor(selected.c / BOX_SIZE);
 
@@ -363,13 +216,21 @@ const GameSudoku: React.FC = () => {
         alignItems: 'center',
         justifyContent: 'center',
         background: bg,
-        borderRight: isBoxBorderC ? `2px solid ${t.primary}` : `0.5px solid ${t.border}`,
-        borderBottom: isBoxBorderR ? `2px solid ${t.primary}` : `0.5px solid ${t.border}`,
+        borderRight: isBoxBorderC
+          ? `2px solid ${t.primary}`
+          : `0.5px solid ${t.border}`,
+        borderBottom: isBoxBorderR
+          ? `2px solid ${t.primary}`
+          : `0.5px solid ${t.border}`,
         fontSize: 18,
         fontWeight: isFixed ? 700 : 500,
         color: isConflict ? '#ff6b6b' : isFixed ? t.text : t.primary,
         cursor: isFixed ? 'default' : 'pointer',
-        boxShadow: isSelected ? `inset 0 0 0 2px ${t.primary}` : (isSameRow || isSameCol || isSameBox) ? 'inset 0 0 0 0.5px rgba(79,142,247,0.15)' : 'none',
+        boxShadow: isSelected
+          ? `inset 0 0 0 2px ${t.primary}`
+          : isSameRow || isSameCol || isSameBox
+            ? 'inset 0 0 0 0.5px rgba(79,142,247,0.15)'
+            : 'none',
         boxSizing: 'border-box' as const,
         transition: 'background 0.1s ease',
       };
@@ -437,15 +298,15 @@ const GameSudoku: React.FC = () => {
       <div style={styles.title}>数独</div>
 
       <div style={styles.difficultyRow}>
-        <button style={styles.diffBtn(difficulty === 'easy')} onClick={() => newGame('easy')}>
-          简单
-        </button>
-        <button style={styles.diffBtn(difficulty === 'medium')} onClick={() => newGame('medium')}>
-          中等
-        </button>
-        <button style={styles.diffBtn(difficulty === 'hard')} onClick={() => newGame('hard')}>
-          困难
-        </button>
+        {(Object.keys(DIFFICULTY_LABELS) as Difficulty[]).map((d) => (
+          <button
+            key={d}
+            style={styles.diffBtn(difficulty === d)}
+            onClick={() => newGame(d)}
+          >
+            {DIFFICULTY_LABELS[d]}
+          </button>
+        ))}
       </div>
 
       <div style={styles.gridContainer}>
@@ -458,7 +319,7 @@ const GameSudoku: React.FC = () => {
             >
               {val !== 0 ? val : ''}
             </div>
-          ))
+          )),
         )}
       </div>
 
@@ -486,14 +347,10 @@ const GameSudoku: React.FC = () => {
 
       {gameComplete && <div style={styles.completeText}>完成! 🎉</div>}
       {checkResult === 'correct' && (
-        <div style={{ color: t.green, fontSize: 14, marginTop: 4 }}>
-          答案正确!
-        </div>
+        <div style={{ color: t.green, fontSize: 14, marginTop: 4 }}>答案正确!</div>
       )}
       {checkResult === 'wrong' && (
-        <div style={styles.wrongText}>
-          还有错误，请检查红色标记的格子
-        </div>
+        <div style={styles.wrongText}>还有错误，请检查红色标记的格子</div>
       )}
     </div>
   );

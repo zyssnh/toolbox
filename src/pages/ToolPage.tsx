@@ -185,6 +185,26 @@ export default function ToolPage() {
         >
           {isFavorited ? '❤️' : '🤍'}
         </button>
+
+        {meta.category === 'game' && (
+          <Link
+            to={`/game/${meta.id.replace('game-', '')}`}
+            style={{
+              color: t.primary,
+              fontSize: 13,
+              textDecoration: 'none',
+              padding: '6px 14px',
+              background: t.hover,
+              border: `0.5px solid ${t.border}`,
+              borderRadius: 6,
+              transition: 'border-color 200ms',
+              whiteSpace: 'nowrap',
+            }}
+            title="全屏独立游玩"
+          >
+            全屏游玩 →
+          </Link>
+        )}
       </div>
 
       {/* Tool content */}
