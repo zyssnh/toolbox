@@ -139,6 +139,8 @@ const GameMinesweeper: React.FC = () => {
   const [timer, setTimer] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const config = DIFFICULTIES[difficulty];
+  const cellSize = difficulty === 'hard' ? 26 : 32;
+  const gridMaxWidth = config.cols * (cellSize + 2) + 4;
 
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -245,7 +247,7 @@ const GameMinesweeper: React.FC = () => {
     },
     header: {
       width: '100%',
-      maxWidth: Math.max(360, config.cols * 34 + 8),
+      maxWidth: gridMaxWidth,
       marginBottom: 12,
     },
     title: {
@@ -283,7 +285,7 @@ const GameMinesweeper: React.FC = () => {
       alignItems: 'center',
       marginBottom: 8,
       width: '100%',
-      maxWidth: config.cols * 34 + 8,
+      maxWidth: gridMaxWidth,
     },
     infoBox: {
       background: t.card,
@@ -301,55 +303,47 @@ const GameMinesweeper: React.FC = () => {
     },
     grid: {
       display: 'grid',
-      gridTemplateColumns: `repeat(${config.cols}, 32px)`,
+      gridTemplateColumns: `repeat(${config.cols}, ${cellSize}px)`,
       gap: 2,
       background: t.bg,
       userSelect: 'none' as const,
+      overflowX: 'auto' as const,
+      maxWidth: gridMaxWidth,
     },
     cell: (cell: Cell) => {
+      const base = {
+        width: cellSize,
+        height: cellSize,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: difficulty === 'hard' ? 2 : 3,
+        fontSize: difficulty === 'hard' ? 13 : 16,
+        fontWeight: 600 as const,
+      };
       if (cell.revealed) {
         if (cell.isMine) {
           return {
-            width: 32,
-            height: 32,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            ...base,
             background: '#ff4444',
-            borderRadius: 3,
-            fontSize: 16,
-            fontWeight: 600,
             cursor: 'default' as const,
             color: '#fff',
           };
         }
         return {
-          width: 32,
-          height: 32,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          ...base,
           background: t.hover,
-          borderRadius: 3,
-          fontSize: 15,
-          fontWeight: 600,
           cursor: 'default' as const,
           color: NUMBER_COLORS[cell.adjacentMines] || 'transparent',
         };
       }
       return {
-        width: 32,
-        height: 32,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        ...base,
         background: '#3a3a42',
-        borderRadius: 3,
         border: '1px solid #55555a',
         borderBottom: '2px solid #2a2a30',
         borderRight: '2px solid #2a2a30',
         cursor: 'pointer',
-        fontSize: 14,
         color: t.text,
       };
     },
@@ -408,7 +402,8 @@ const GameMinesweeper: React.FC = () => {
         </div>
       </div>
 
-      <div style={styles.grid}>
+      <div style={{ width: '100%', maxWidth: gridMaxWidth, overflowX: 'auto', paddingBottom: 4 }}>
+        <div style={styles.grid}>
         {board.map((row, ri) =>
           row.map((cell, ci) => (
             <div
@@ -427,6 +422,7 @@ const GameMinesweeper: React.FC = () => {
             </div>
           ))
         )}
+        </div>
       </div>
 
       {gameState === 'lost' && <div style={styles.gameOverText}>游戏结束! 踩到地雷了 💥</div>}

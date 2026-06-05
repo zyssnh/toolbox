@@ -210,9 +210,8 @@ const GameSudoku: React.FC = () => {
 
   const handleCellClick = useCallback((r: number, c: number) => {
     if (gameComplete) return;
-    if (fixedCells[r][c]) return;
     setSelected({ r, c });
-  }, [fixedCells, gameComplete]);
+  }, [gameComplete]);
 
   const placeNumber = useCallback((num: number) => {
     if (!selected || gameComplete) return;
@@ -222,15 +221,17 @@ const GameSudoku: React.FC = () => {
     setBoard((prev) => {
       const newBoard = prev.map((row) => [...row]);
       newBoard[r][c] = prev[r][c] === num ? 0 : num;
-
-      if (isBoardComplete(newBoard) && isBoardValid(newBoard)) {
-        setGameComplete(true);
-      }
-
       return newBoard;
     });
     setCheckResult(null);
   }, [selected, fixedCells, gameComplete]);
+
+  // Check for completion after each board update
+  useEffect(() => {
+    if (!gameComplete && isBoardComplete(board) && isBoardValid(board)) {
+      setGameComplete(true);
+    }
+  }, [board, gameComplete]);
 
   const handleCheck = useCallback(() => {
     if (isBoardComplete(board)) {
@@ -345,10 +346,15 @@ const GameSudoku: React.FC = () => {
       const isFixed = fixedCells[r][c];
       const isBoxBorderR = r % BOX_SIZE === BOX_SIZE - 1 && r < SIZE - 1;
       const isBoxBorderC = c % BOX_SIZE === BOX_SIZE - 1 && c < SIZE - 1;
+      const isSameRow = selected?.r === r;
+      const isSameCol = selected?.c === c;
+      const isSameBox = selected != null &&
+        Math.floor(r / BOX_SIZE) === Math.floor(selected.r / BOX_SIZE) &&
+        Math.floor(c / BOX_SIZE) === Math.floor(selected.c / BOX_SIZE);
 
       let bg = t.hover;
-      if (isSelected) bg = '#1e2d44';
-      else if (isSameNum && !isSelected) bg = '#181e2b';
+      if (isSelected) bg = t.hover;
+      else if (isSameNum && !isSelected) bg = t.hover;
 
       return {
         width: 40,
@@ -363,8 +369,9 @@ const GameSudoku: React.FC = () => {
         fontWeight: isFixed ? 700 : 500,
         color: isConflict ? '#ff6b6b' : isFixed ? t.text : t.primary,
         cursor: isFixed ? 'default' : 'pointer',
-        outline: isSelected ? `1px solid ${t.primary}` : 'none',
+        boxShadow: isSelected ? `inset 0 0 0 2px ${t.primary}` : (isSameRow || isSameCol || isSameBox) ? 'inset 0 0 0 0.5px rgba(79,142,247,0.15)' : 'none',
         boxSizing: 'border-box' as const,
+        transition: 'background 0.1s ease',
       };
     },
     numPad: {

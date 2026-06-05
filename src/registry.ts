@@ -7,6 +7,7 @@ export const toolMetas: ToolMeta[] = [
   { id: 'unit-weight', name: '重量换算', description: 'kg / lb / oz / 克 / 斤', category: 'unit', icon: '⚖️', tags: ['重量','公斤','磅','换算'] },
   { id: 'unit-temperature', name: '温度换算', description: '摄氏 / 华氏 / 开尔文', category: 'unit', icon: '🌡️', tags: ['温度','摄氏','华氏','开尔文'] },
   { id: 'unit-data', name: '数据量换算', description: 'B / KB / MB / GB / TB', category: 'unit', icon: '💾', tags: ['存储','字节','MB','GB','换算'], isNew: true },
+  { id: 'unit-currency', name: '汇率换算', description: 'CNY / USD / EUR / JPY / GBP 等', category: 'unit', icon: '💱', tags: ['汇率','货币','人民币','美元','换算'], isNew: true },
   // 时间日期
   { id: 'time-timestamp', name: '时间戳转换', description: 'Unix 时间戳 ↔ 人类可读时间', category: 'time', icon: '🕐', tags: ['时间戳','unix','timestamp'], isHot: true },
   { id: 'time-timezone', name: '时区转换', description: '全球主要城市时区对照', category: 'time', icon: '🌍', tags: ['时区','时差','UTC','GMT'] },
@@ -34,6 +35,7 @@ export const toolComponents: Record<string, React.LazyExoticComponent<any>> = {
   'unit-weight': lazy(() => import('./tools/unit-weight')),
   'unit-temperature': lazy(() => import('./tools/unit-temperature')),
   'unit-data': lazy(() => import('./tools/unit-data')),
+  'unit-currency': lazy(() => import('./tools/unit-currency')),
   'time-timestamp': lazy(() => import('./tools/time-timestamp')),
   'time-timezone': lazy(() => import('./tools/time-timezone')),
   'time-countdown': lazy(() => import('./tools/time-countdown')),

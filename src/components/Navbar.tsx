@@ -47,9 +47,53 @@ export default function Navbar() {
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
       </div>
 
+      <a
+        href="https://zyssnh.github.io/docstools"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          textDecoration: 'none',
+          color: t.textSecondary,
+          fontSize: 14,
+          flexShrink: 0,
+        }}
+      >
+        文档
+      </a>
+
+      <Link
+        to="/#/favorites"
+        style={{
+          textDecoration: 'none',
+          color: t.textSecondary,
+          fontSize: 14,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          flexShrink: 0,
+        }}
+      >
+        收藏
+        {favoritesCount > 0 && (
+          <span
+            style={{
+              background: t.primary,
+              color: '#fff',
+              borderRadius: 20,
+              padding: '2px 8px',
+              fontSize: 12,
+              fontWeight: 600,
+              minWidth: 20,
+              textAlign: 'center',
+            }}
+          >
+            {favoritesCount}
+          </span>
+        )}
+      </Link>
+
       <button
         onClick={toggleTheme}
-        className="theme-toggle-btn"
         style={{
           background: 'none',
           border: `0.5px solid ${t.border}`,
@@ -68,51 +112,6 @@ export default function Navbar() {
       >
         {mode === 'dark' ? '☀️' : '🌙'}
       </button>
-
-      <a
-        href="https://zyssnh.github.io/docstools/"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          textDecoration: 'none',
-          color: t.textSecondary,
-          fontSize: 14,
-          flexShrink: 0,
-        }}
-      >
-        📖 文档
-      </a>
-
-      <Link
-        to="/#/favorites"
-        style={{
-          textDecoration: 'none',
-          color: t.textSecondary,
-          fontSize: 14,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          flexShrink: 0,
-        }}
-      >
-        ❤️ 收藏
-        {favoritesCount > 0 && (
-          <span
-            style={{
-              background: t.primary,
-              color: '#fff',
-              borderRadius: 20,
-              padding: '2px 8px',
-              fontSize: 12,
-              fontWeight: 600,
-              minWidth: 20,
-              textAlign: 'center',
-            }}
-          >
-            {favoritesCount}
-          </span>
-        )}
-      </Link>
     </nav>
   );
 }
