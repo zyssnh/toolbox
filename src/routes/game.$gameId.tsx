@@ -18,7 +18,7 @@ function GamePage() {
       {/* Top bar */}
       <div className="flex items-center px-4 h-12 border-b border-border bg-card/50 backdrop-blur-sm shrink-0">
         <Link
-          to="/" search={{}}
+          to="/"
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />

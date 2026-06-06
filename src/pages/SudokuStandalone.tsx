@@ -550,7 +550,7 @@ const SudokuStandaloneInner: React.FC = () => {
       {/* Top bar */}
       <div style={topBarStyle}>
         <Link
-          to="/" search={{}}
+          to="/"
           style={{
             color: T.textSecondary,
             fontSize: 13,

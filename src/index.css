@@ -141,9 +141,6 @@ body {
 }
 
 /* ---- Global transition for theme switching (only on theme-related props) ---- */
-body {
-  transition: background-color 0.5s ease, color 0.5s ease;
-}
 
 /* ---- Sudoku preserved animations ---- */
 @keyframes sudoku-mesh-shift {

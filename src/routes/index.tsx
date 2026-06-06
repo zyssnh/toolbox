@@ -1,13 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { Heart, Clock, Wrench, Gamepad2, Search } from 'lucide-react';
+import { Heart, Clock, Wrench, Gamepad2 } from 'lucide-react';
 import { toolMetas, categories } from '@/registry';
 import { useAppStore } from '@/store/useAppStore';
 import { cn } from '@/lib/utils';
 
 function HomePage() {
-  const { search } = Route.useSearch();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const favorites = useAppStore((s) => s.favorites);
   const recentTools = useAppStore((s) => s.recentTools);
@@ -18,17 +17,8 @@ function HomePage() {
     if (activeCategory !== 'all') {
       list = list.filter((t) => t.category === activeCategory);
     }
-    if (search) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (t) =>
-          t.name.toLowerCase().includes(q) ||
-          t.description.toLowerCase().includes(q) ||
-          t.tags.some((tag) => tag.toLowerCase().includes(q)),
-      );
-    }
     return list;
-  }, [search, activeCategory]);
+  }, [activeCategory]);
 
   const grouped = useMemo(() => {
     const map: Record<string, typeof toolMetas> = {};
@@ -46,7 +36,7 @@ function HomePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       {/* Hero */}
-      <div className="text-left mb-8">
+      <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground mb-1.5 tracking-tight">
           在线工具箱
         </h1>
@@ -55,7 +45,7 @@ function HomePage() {
         </p>
       </div>
 
-      {/* Category tabs — left-aligned with content */}
+      {/* Category tabs */}
       <div className="flex flex-wrap gap-1.5 mb-8">
         {categories.map((cat) => (
           <button
@@ -74,7 +64,7 @@ function HomePage() {
       </div>
 
       {/* Recent tools */}
-      {recentTools.length > 0 && !search && activeCategory === 'all' && (
+      {recentTools.length > 0 && activeCategory === 'all' && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-3 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" /> 最近使用
@@ -174,7 +164,6 @@ function HomePage() {
       {/* Empty state */}
       {filtered.length === 0 && (
         <div className="text-center py-20 text-muted-foreground">
-          <Search className="h-10 w-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">没有找到匹配的工具</p>
         </div>
       )}
@@ -184,7 +173,4 @@ function HomePage() {
 
 export const Route = createFileRoute('/')({
   component: HomePage,
-  validateSearch: (params: Record<string, unknown>): { search?: string } => ({
-    search: typeof params.search === 'string' ? params.search : undefined,
-  }),
 });

@@ -30,7 +30,7 @@ function ToolPage() {
       {/* Breadcrumb + meta */}
       <div className="flex items-center gap-3 mb-6 flex-wrap">
         <Link
-          to="/" search={{}}
+          to="/"
           className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:border-ring/50 transition-all no-underline"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -99,7 +99,7 @@ export const Route = createFileRoute('/tool/$id')({
       <p className="text-lg font-medium text-foreground mb-2">工具未找到</p>
       <p className="text-sm text-muted-foreground mb-6">该工具可能已被移除或链接无效</p>
       <Link
-        to="/" search={{}}
+        to="/"
         className="text-primary hover:underline text-sm"
       >
         返回首页

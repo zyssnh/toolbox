@@ -1,5 +1,5 @@
-import { createRootRoute, Outlet, Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState, useCallback } from 'react';
+import { createRootRoute, Outlet, Link } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import { useRouterState } from '@tanstack/react-router';
 import { useAppStore } from '@/store/useAppStore';
 import { Sun, Moon, Heart, Search } from 'lucide-react';
@@ -9,7 +9,6 @@ function Navbar() {
   const toggleTheme = useAppStore((s) => s.toggleTheme);
   const favorites = useAppStore((s) => s.favorites);
   const [searchValue, setSearchValue] = useState('');
-  const navigate = useNavigate();
 
   // Apply theme class to <html>
   useEffect(() => {
@@ -20,16 +19,6 @@ function Navbar() {
       root.classList.remove('light');
     }
   }, [theme]);
-
-  const handleSearch = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
-        const q = searchValue.trim();
-        navigate({ to: '/', search: q ? { search: q } : {} });
-      }
-    },
-    [searchValue, navigate],
-  );
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
@@ -55,7 +44,13 @@ function Navbar() {
               placeholder="搜索工具..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={handleSearch}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchValue.trim()) {
+                  window.location.assign(
+                    window.location.pathname + '?search=' + encodeURIComponent(searchValue.trim())
+                  );
+                }
+              }}
               className="w-full h-9 pl-9 pr-4 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             />
           </div>
