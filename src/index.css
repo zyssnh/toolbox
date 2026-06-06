@@ -101,6 +101,78 @@ a:hover { color: #7aabff; }
 }
 
 .sudoku-glass-bg {
+  will-change: background-position;
+  transform: translateZ(0);
   animation: sudoku-mesh-shift 20s ease-in-out infinite;
   background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+}
+
+/* ---------- Sudoku board entrance animation ---------- */
+@keyframes sudoku-board-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.sudoku-board-enter {
+  animation: sudoku-board-enter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ---------- Sudoku skeleton loading pulse ---------- */
+@keyframes sudoku-skeleton-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.sudoku-skeleton-cell {
+  animation: sudoku-skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+/* ---------- Sudoku page fade-in ---------- */
+@keyframes sudoku-page-enter {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.sudoku-page-enter {
+  animation: sudoku-page-enter 0.2s ease-out forwards;
+}
+
+/* ---------- Sudoku control panel slide-in ---------- */
+@keyframes sudoku-panel-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sudoku-panel-enter {
+  animation: sudoku-panel-enter 0.3s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* ---------- Sudoku completion dialog pop ---------- */
+@keyframes sudoku-dialog-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.sudoku-dialog-pop > div {
+  animation: sudoku-dialog-pop 0.3s 0.05s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
 }

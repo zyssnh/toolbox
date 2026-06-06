@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import type { Difficulty, Board, FixedBoard } from '../tools/game-sudoku/types';
@@ -22,6 +22,13 @@ import {
   getSudokuTheme,
 } from '../tools/game-sudoku/themes';
 
+/** Yields to the browser's event loop so the UI can paint before heavy work */
+function yieldToBrowser(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => setTimeout(resolve, 0));
+  });
+}
+
 /* ================================================================
    Inner Component (wrapped in SudokuThemeProvider)
    ================================================================ */
@@ -41,6 +48,7 @@ const SudokuStandaloneInner: React.FC = () => {
   const [gameComplete, setGameComplete] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [isBoardReady, setIsBoardReady] = useState(false);
 
   // ---- Features ----
   const timer = useTimer();
@@ -65,9 +73,12 @@ const SudokuStandaloneInner: React.FC = () => {
 
   // ---- New game ----
   const newGame = useCallback(
-    (diff?: Difficulty) => {
+    async (diff?: Difficulty) => {
       const d = diff || difficulty;
       setDifficulty(d);
+      setIsBoardReady(false);
+      // Yield to browser so the UI can update (showing loading state)
+      await yieldToBrowser();
       const { puzzle: p, solution: s, fixedCells: f } = generatePuzzle(d);
       setBoard(p.map((row) => [...row]));
       setSolution(s);
@@ -81,6 +92,10 @@ const SudokuStandaloneInner: React.FC = () => {
       resetHistory(p);
       resetMarks();
       resetHints();
+      // Brief delay so the entrance animation plays after state settles
+      requestAnimationFrame(() => {
+        setIsBoardReady(true);
+      });
     },
     [difficulty, timer, resetHistory, resetMarks, resetHints],
   );
@@ -90,13 +105,10 @@ const SudokuStandaloneInner: React.FC = () => {
   useEffect(() => {
     if (!initialized.current) {
       initialized.current = true;
-      const { puzzle: p, solution: s, fixedCells: f } = generatePuzzle('easy');
-      setBoard(p.map((row) => [...row]));
-      setSolution(s);
-      setFixedCells(f);
-      resetHistory(p);
+      newGame('easy');
     }
-  }, [resetHistory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ---- Cell interaction ----
   const handleCellClick = useCallback(
@@ -445,8 +457,96 @@ const SudokuStandaloneInner: React.FC = () => {
   // ================================================================
   //  RENDER
   // ================================================================
+  // ---- Memoized board grid (avoids re-rendering all cells on every state change) ----
+  const boardGrid = useMemo(() => {
+    return board.map((row, ri) =>
+      row.map((val, ci) => {
+        const marks = pencilMarks[ri][ci];
+        return (
+          <div
+            key={`${ri}-${ci}`}
+            style={cellStyle(ri, ci)}
+            onClick={() => handleCellClick(ri, ci)}
+          >
+            {val !== 0 ? (
+              val
+            ) : marks && marks.size > 0 ? (
+              <div style={pencilStyle}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+                  <span key={n}>{marks.has(n) ? n : ''}</span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        );
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [board, pencilMarks, selected, sameNumCells.size, conflictCells.size, hintCell]);
+
+  // ---- Skeleton grid (shown while puzzle generates) ----
+  const skeletonGrid = useMemo(() => {
+    return Array.from({ length: SIZE }, (_, ri) =>
+      Array.from({ length: SIZE }, (_, ci) => (
+        <div
+          key={`sk-${ri}-${ci}`}
+          style={{
+            width: '100%',
+            aspectRatio: '1',
+            borderRight:
+              ci % BOX_SIZE === BOX_SIZE - 1 && ci < SIZE - 1
+                ? `2px solid ${T.boxBorder}`
+                : `0.5px solid ${T.cellBorder}`,
+            borderBottom:
+              ri % BOX_SIZE === BOX_SIZE - 1 && ri < SIZE - 1
+                ? `2px solid ${T.boxBorder}`
+                : `0.5px solid ${T.cellBorder}`,
+            boxSizing: 'border-box' as const,
+          }}
+        >
+          <div
+            className="sudoku-skeleton-cell"
+            style={{
+              width: '100%',
+              height: '100%',
+              background: T.cellHighlightBg,
+              borderRadius: 2,
+            }}
+          />
+        </div>
+      )),
+    );
+  }, [T.boxBorder, T.cellBorder, T.cellHighlightBg]);
+
+  // Memoized numpad
+  const numPad = useMemo(
+    () =>
+      [1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+        <button
+          key={num}
+          style={{
+            ...btnStyle(),
+            width: isNarrow ? undefined : 52,
+            height: 52,
+            fontSize: 20,
+            fontWeight: 600,
+            fontFamily: theme.fonts.board,
+          }}
+          onClick={() => handleNumberInput(num)}
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          {num}
+        </button>
+      )),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isNarrow, T.buttonBg, T.buttonText, T.accentColor, theme.fonts.board],
+  );
+
   return (
-    <div style={pageStyle} className={theme.id === 'glassmorphism' ? 'sudoku-glass-bg' : ''}>
+    <div
+      style={pageStyle}
+      className={`${theme.id === 'glassmorphism' ? 'sudoku-glass-bg' : ''} sudoku-page-enter`}
+    >
       {/* Top bar */}
       <div style={topBarStyle}>
         <Link
@@ -564,35 +664,18 @@ const SudokuStandaloneInner: React.FC = () => {
         }}
       >
         {/* Board */}
-        <div style={boardOuterStyle}>
+        <div
+          style={boardOuterStyle}
+          className={isBoardReady ? 'sudoku-board-enter' : ''}
+        >
           <div style={gridStyle}>
-            {board.map((row, ri) =>
-              row.map((val, ci) => {
-                const marks = pencilMarks[ri][ci];
-                return (
-                  <div
-                    key={`${ri}-${ci}`}
-                    style={cellStyle(ri, ci)}
-                    onClick={() => handleCellClick(ri, ci)}
-                  >
-                    {val !== 0 ? (
-                      val
-                    ) : marks && marks.size > 0 ? (
-                      <div style={pencilStyle}>
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                          <span key={n}>{marks.has(n) ? n : ''}</span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              }),
-            )}
+            {isBoardReady ? boardGrid : skeletonGrid}
           </div>
         </div>
 
         {/* Control panel */}
         <div
+          className={isBoardReady ? 'sudoku-panel-enter' : ''}
           style={{
             display: 'flex',
             flexDirection: isNarrow ? 'row' : 'column',
@@ -610,23 +693,7 @@ const SudokuStandaloneInner: React.FC = () => {
               gap: 6,
             }}
           >
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-              <button
-                key={num}
-                style={{
-                  ...btnStyle(),
-                  width: isNarrow ? undefined : 52,
-                  height: 52,
-                  fontSize: 20,
-                  fontWeight: 600,
-                  fontFamily: theme.fonts.board,
-                }}
-                onClick={() => handleNumberInput(num)}
-                onMouseDown={(e) => e.preventDefault()}
-              >
-                {num}
-              </button>
-            ))}
+            {numPad}
           </div>
 
           {/* Action buttons */}
@@ -688,7 +755,7 @@ const SudokuStandaloneInner: React.FC = () => {
                 ...btnStyle(true),
                 marginTop: isNarrow ? 0 : 8,
               }}
-              onClick={() => newGame()}
+              onClick={() => { void newGame(); }}
             >
               🆕 新游戏
             </button>
@@ -717,7 +784,7 @@ const SudokuStandaloneInner: React.FC = () => {
                     fontFamily: theme.fonts.ui,
                     transition: 'all 0.15s ease',
                   }}
-                  onClick={() => newGame(d)}
+                  onClick={() => { void newGame(d); }}
                 >
                   {DIFFICULTY_LABELS[d]}
                 </button>
@@ -772,6 +839,7 @@ const SudokuStandaloneInner: React.FC = () => {
       {/* ===================== COMPLETION DIALOG ===================== */}
       {showCompletion && (
         <div
+          className="sudoku-dialog-pop"
           style={{
             position: 'fixed',
             inset: 0,
@@ -829,7 +897,7 @@ const SudokuStandaloneInner: React.FC = () => {
               }}
               onClick={() => {
                 setShowCompletion(false);
-                newGame();
+                void newGame();
               }}
             >
               🆕 再来一局
