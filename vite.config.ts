@@ -13,7 +13,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico'],
+      includeAssets: ['favicon.png', 'robots.txt'],
       manifest: {
         name: '在线工具箱',
         short_name: 'ToolKit',
