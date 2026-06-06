@@ -11,7 +11,7 @@ function FavoritesPage() {
     <div className="mx-auto max-w-4xl px-4 py-8">
       <div className="flex items-center gap-3 mb-8">
         <Link
-          to="/"
+          to="/" search={{}}
           className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:border-ring/50 transition-all no-underline"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -31,7 +31,7 @@ function FavoritesPage() {
             在工具页面点击收藏按钮即可添加到这里
           </p>
           <Link
-            to="/"
+            to="/" search={{}}
             className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity no-underline"
           >
             浏览工具

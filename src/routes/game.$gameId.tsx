@@ -14,24 +14,26 @@ function GamePage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
-      <div className="flex items-center px-4 h-12 border-b border-border bg-card/50 backdrop-blur-sm">
+      <div className="flex items-center px-4 h-12 border-b border-border bg-card/50 backdrop-blur-sm shrink-0">
         <Link
-          to="/"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
+          to="/" search={{}}
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           工具箱
         </Link>
         <div className="flex-1 text-center">
-          <span className="text-base font-medium text-foreground">{meta.icon} {meta.name}</span>
+          <span className="text-base font-medium text-foreground">
+            {meta.icon} {meta.name}
+          </span>
         </div>
         <div className="w-16" />
       </div>
 
       {/* Game area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex">
         <Suspense
           fallback={
             <div className="flex-1 flex items-center justify-center text-muted-foreground">

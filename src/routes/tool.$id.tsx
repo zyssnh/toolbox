@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { ArrowLeft, Heart, ExternalLink } from 'lucide-react';
 import { toolMetas, toolComponents, categories } from '@/registry';
 import { useAppStore } from '@/store/useAppStore';
@@ -15,10 +15,9 @@ function ToolPage() {
   const isFav = favorites.includes(id);
   const cat = categories.find((c) => c.id === meta?.category);
 
-  // Record to recent
-  if (typeof window !== 'undefined') {
+  useEffect(() => {
     addRecent(id);
-  }
+  }, [id, addRecent]);
 
   if (!meta || !Component) {
     throw notFound();
@@ -31,7 +30,7 @@ function ToolPage() {
       {/* Breadcrumb + meta */}
       <div className="flex items-center gap-3 mb-6 flex-wrap">
         <Link
-          to="/"
+          to="/" search={{}}
           className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:border-ring/50 transition-all no-underline"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -100,7 +99,7 @@ export const Route = createFileRoute('/tool/$id')({
       <p className="text-lg font-medium text-foreground mb-2">工具未找到</p>
       <p className="text-sm text-muted-foreground mb-6">该工具可能已被移除或链接无效</p>
       <Link
-        to="/"
+        to="/" search={{}}
         className="text-primary hover:underline text-sm"
       >
         返回首页

@@ -7,7 +7,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { cn } from '@/lib/utils';
 
 function HomePage() {
-  const [search, setSearch] = useState('');
+  const { search } = Route.useSearch();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const favorites = useAppStore((s) => s.favorites);
   const recentTools = useAppStore((s) => s.recentTools);
@@ -18,7 +18,7 @@ function HomePage() {
     if (activeCategory !== 'all') {
       list = list.filter((t) => t.category === activeCategory);
     }
-    if (search.trim()) {
+    if (search) {
       const q = search.toLowerCase();
       list = list.filter(
         (t) =>
@@ -38,34 +38,25 @@ function HomePage() {
     return map;
   }, [filtered]);
 
-  const catMap = new Map(categories.map((c) => [c.id, c]));
+  const catMap = useMemo(
+    () => new Map(categories.map((c) => [c.id, c])),
+    [],
+  );
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       {/* Hero */}
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-foreground mb-3 tracking-tight">
+      <div className="text-left mb-8">
+        <h1 className="text-2xl font-bold text-foreground mb-1.5 tracking-tight">
           在线工具箱
         </h1>
-        <p className="text-muted-foreground text-base max-w-lg mx-auto leading-relaxed">
+        <p className="text-muted-foreground text-sm leading-relaxed">
           精选开发工具集合，离线可用，数据本地存储
         </p>
-
-        {/* Search bar (hero) */}
-        <div className="mt-6 mx-auto max-w-md relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <input
-            type="text"
-            placeholder="搜索 20+ 工具..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-sm shadow-sm"
-          />
-        </div>
       </div>
 
-      {/* Category tabs */}
-      <div className="flex flex-wrap gap-1.5 mb-8 justify-center">
+      {/* Category tabs — left-aligned with content */}
+      <div className="flex flex-wrap gap-1.5 mb-8">
         {categories.map((cat) => (
           <button
             key={cat.id}
@@ -123,7 +114,7 @@ function HomePage() {
               )}
               {cat.label}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3">
               {tools.map((tool) => {
                 const isFav = favorites.includes(tool.id);
                 return (
@@ -193,4 +184,7 @@ function HomePage() {
 
 export const Route = createFileRoute('/')({
   component: HomePage,
+  validateSearch: (params: Record<string, unknown>): { search?: string } => ({
+    search: typeof params.search === 'string' ? params.search : undefined,
+  }),
 });

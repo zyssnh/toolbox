@@ -1,5 +1,6 @@
-import { createRootRoute, Outlet, Link } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { createRootRoute, Outlet, Link, useNavigate } from '@tanstack/react-router';
+import { useEffect, useState, useCallback } from 'react';
+import { useRouterState } from '@tanstack/react-router';
 import { useAppStore } from '@/store/useAppStore';
 import { Sun, Moon, Heart, Search } from 'lucide-react';
 
@@ -7,6 +8,8 @@ function Navbar() {
   const theme = useAppStore((s) => s.theme);
   const toggleTheme = useAppStore((s) => s.toggleTheme);
   const favorites = useAppStore((s) => s.favorites);
+  const [searchValue, setSearchValue] = useState('');
+  const navigate = useNavigate();
 
   // Apply theme class to <html>
   useEffect(() => {
@@ -18,13 +21,24 @@ function Navbar() {
     }
   }, [theme]);
 
+  const handleSearch = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        const q = searchValue.trim();
+        navigate({ to: '/', search: q ? { search: q } : {} });
+      }
+    },
+    [searchValue, navigate],
+  );
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
         {/* Logo */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-lg font-semibold text-foreground no-underline shrink-0"
+          search={{}}
+          className="flex items-center gap-2 text-lg font-semibold text-foreground"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground text-sm font-bold">
             T
@@ -39,9 +53,10 @@ function Navbar() {
             <input
               type="text"
               placeholder="搜索工具..."
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={handleSearch}
               className="w-full h-9 pl-9 pr-4 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-              onFocus={() => {}}
-              onBlur={() => {}}
             />
           </div>
         </div>
@@ -75,12 +90,17 @@ function Navbar() {
 }
 
 export const Route = createRootRoute({
-  component: () => (
-    <div className="min-h-screen bg-background text-foreground font-sans">
-      <Navbar />
-      <main className="pt-14">
-        <Outlet />
-      </main>
-    </div>
-  ),
+  component: () => {
+    const pathname = useRouterState({ select: (s) => s.location.pathname });
+    const isGameStandalone = pathname.startsWith('/game/');
+
+    return (
+      <div className="min-h-screen bg-background text-foreground font-sans">
+        {!isGameStandalone && <Navbar />}
+        <main className={!isGameStandalone ? 'pt-14' : ''}>
+          <Outlet />
+        </main>
+      </div>
+    );
+  },
 });
