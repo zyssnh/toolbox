@@ -1,166 +1,60 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useTheme } from '../../theme';
+import { useState, useMemo } from 'react';
+import { CopyButton } from '@/components/shared/CopyButton';
 
-const makeStyles = (t: ReturnType<typeof useTheme>): Record<string, React.CSSProperties> => ({
-  wrapper: {
-    padding: 20,
-  },
-  textarea: {
-    width: '100%',
-    minHeight: 220,
-    background: t.inputBg,
-    border: `0.5px solid ${t.border}`,
-    borderRadius: 6,
-    padding: '8px 12px',
-    color: t.text,
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 13,
-    lineHeight: 1.6,
-    resize: 'vertical' as const,
-    outline: 'none',
-    boxSizing: 'border-box' as const,
-  },
-  toolbar: {
-    display: 'flex',
-    gap: 8,
-    marginTop: 12,
-    flexWrap: 'wrap' as const,
-    alignItems: 'center',
-  },
-  btn: {
-    background: t.primary,
-    color: 'white',
-    border: 'none',
-    borderRadius: 6,
-    padding: '8px 20px',
-    cursor: 'pointer',
-    fontSize: 13,
-    fontWeight: 500,
-  },
-  btnSecondary: {
-    background: t.hover,
-    border: `0.5px solid ${t.border}`,
-    color: t.text,
-    borderRadius: 6,
-    padding: '8px 20px',
-    cursor: 'pointer',
-    fontSize: 13,
-    fontWeight: 500,
-  },
-  charCount: {
-    color: t.textSecondary,
-    fontSize: 12,
-    fontFamily: "'JetBrains Mono', monospace",
-    marginLeft: 'auto',
-  },
-  resultArea: {
-    background: t.inputBg,
-    border: `0.5px solid ${t.border}`,
-    borderRadius: 8,
-    padding: 16,
-    fontFamily: "'JetBrains Mono', monospace",
-    color: t.green,
-    fontSize: 13,
-    lineHeight: 1.7,
-    whiteSpace: 'pre-wrap' as const,
-    wordBreak: 'break-all' as const,
-    marginTop: 16,
-    maxHeight: 480,
-    overflow: 'auto',
-  },
-  errorArea: {
-    background: t.inputBg,
-    border: '0.5px solid #FF5C5C',
-    borderRadius: 8,
-    padding: 16,
-    fontFamily: "'JetBrains Mono', monospace",
-    color: '#FF5C5C',
-    fontSize: 13,
-    lineHeight: 1.7,
-    whiteSpace: 'pre-wrap' as const,
-    marginTop: 16,
-  },
-  label: {
-    color: t.textSecondary,
-    fontSize: 13,
-    fontWeight: 500,
-    marginBottom: 6,
-    display: 'block',
-  },
-});
-
-const TextJson: React.FC = () => {
-  const t = useTheme();
-  const styles = useMemo(() => makeStyles(t), [t]);
-
+export default function TextJson() {
   const [input, setInput] = useState('');
-  const [result, setResult] = useState('');
-  const [isError, setIsError] = useState(false);
+  const [indent, setIndent] = useState(2);
 
-  const charCount = useMemo(() => input.length, [input]);
-
-  const handleFormat = useCallback(() => {
+  const { formatted, compact, isError } = useMemo(() => {
+    if (!input.trim()) return { formatted: '', compact: '', isError: false };
     try {
       const parsed = JSON.parse(input);
-      setResult(JSON.stringify(parsed, null, 2));
-      setIsError(false);
-    } catch (e: any) {
-      setResult(`JSON 解析错误：${e.message}`);
-      setIsError(true);
+      return {
+        formatted: JSON.stringify(parsed, null, indent),
+        compact: JSON.stringify(parsed),
+        isError: false,
+      };
+    } catch {
+      return { formatted: '', compact: '', isError: true };
     }
-  }, [input]);
+  }, [input, indent]);
 
-  const handleMinify = useCallback(() => {
-    try {
-      const parsed = JSON.parse(input);
-      setResult(JSON.stringify(parsed));
-      setIsError(false);
-    } catch (e: any) {
-      setResult(`JSON 解析错误：${e.message}`);
-      setIsError(true);
-    }
-  }, [input]);
-
-  const handleValidate = useCallback(() => {
-    try {
-      JSON.parse(input);
-      setResult('JSON 格式正确');
-      setIsError(false);
-    } catch (e: any) {
-      setResult(`JSON 格式错误：${e.message}`);
-      setIsError(true);
-    }
-  }, [input]);
-
-  const handleClear = useCallback(() => {
-    setInput('');
-    setResult('');
-    setIsError(false);
-  }, []);
+  const output = indent === 0 ? compact : formatted;
 
   return (
-    <div style={styles.wrapper}>
-      <label style={styles.label}>JSON 输入</label>
+    <div className="space-y-4">
       <textarea
-        style={styles.textarea}
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder='粘贴 JSON 字符串，例如：{"name":"张三","age":25}'
+        placeholder='输入 JSON 文本... 例如: {"key":"value"}'
+        rows={6}
+        className="w-full rounded-xl border border-border bg-background p-4 font-mono text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-y"
       />
-      <div style={styles.toolbar}>
-        <button style={styles.btn} onClick={handleFormat}>格式化</button>
-        <button style={styles.btn} onClick={handleMinify}>压缩</button>
-        <button style={styles.btn} onClick={handleValidate}>校验</button>
-        <button style={styles.btnSecondary} onClick={handleClear}>清除</button>
-        <span style={styles.charCount}>{charCount} 字符</span>
+
+      <div className="flex items-center gap-4 flex-wrap">
+        <label className="flex items-center gap-2 text-sm text-muted-foreground">
+          缩进:
+          <select
+            value={indent}
+            onChange={(e) => setIndent(+e.target.value)}
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value={2}>2 空格</option>
+            <option value={4}>4 空格</option>
+            <option value={0}>压缩</option>
+          </select>
+        </label>
+        {isError && (
+          <span className="text-sm text-destructive font-medium">JSON 格式错误</span>
+        )}
       </div>
-      {result && (
-        <div style={isError ? styles.errorArea : styles.resultArea}>
-          {result}
+
+      {output && !isError && (
+        <div className="flex items-start justify-between gap-3 rounded-xl border border-border bg-muted/50 p-4 font-mono text-sm text-foreground break-all whitespace-pre-wrap overflow-x-auto max-h-96 overflow-y-auto">
+          <code className="flex-1">{output}</code>
+          <CopyButton text={output} />
         </div>
       )}
     </div>
   );
-};
-
-export default TextJson;
+}

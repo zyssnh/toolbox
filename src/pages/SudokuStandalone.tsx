@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { useAppStore } from '../store/useAppStore';
 import type { Difficulty, Board, FixedBoard } from '../tools/game-sudoku/types';
 import { SIZE, BOX_SIZE, DIFFICULTY_LABELS } from '../tools/game-sudoku/types';

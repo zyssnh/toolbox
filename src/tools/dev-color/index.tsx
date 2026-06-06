@@ -1,235 +1,125 @@
-import React, { useState, useEffect } from 'react';
-import { useTheme } from '../../theme';
-
-/* ---------- Color helpers ---------- */
-function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const h = hex.replace(/^#/, '');
-  if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
-  return {
-    r: parseInt(h.substring(0, 2), 16),
-    g: parseInt(h.substring(2, 4), 16),
-    b: parseInt(h.substring(4, 6), 16),
-  };
-}
-
-function rgbToHex(r: number, g: number, b: number): string {
-  const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
-  return '#' + ((1 << 24) + (clamp(r) << 16) + (clamp(g) << 8) + clamp(b))
-    .toString(16).slice(1).toUpperCase();
-}
-
-function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
-  const nr = r / 255, ng = g / 255, nb = b / 255;
-  const max = Math.max(nr, ng, nb), min = Math.min(nr, ng, nb);
-  let h = 0, s = 0;
-  const l = (max + min) / 2;
-  if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case nr: h = ((ng - nb) / d + (ng < nb ? 6 : 0)) / 6; break;
-      case ng: h = ((nb - nr) / d + 2) / 6; break;
-      case nb: h = ((nr - ng) / d + 4) / 6; break;
-    }
-  }
-  return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
-}
-
-function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
-  const nh = h / 360, ns = s / 100, nl = l / 100;
-  let r = 0, g = 0, b = 0;
-  if (ns === 0) {
-    r = g = b = nl;
-  } else {
-    function hue2rgb(p: number, q: number, t: number): number {
-      if (t < 0) t += 1;
-      if (t > 1) t -= 1;
-      if (t < 1 / 6) return p + (q - p) * 6 * t;
-      if (t < 1 / 2) return q;
-      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-      return p;
-    }
-    const q = nl < 0.5 ? nl * (1 + ns) : nl + ns - nl * ns;
-    const p = 2 * nl - q;
-    r = hue2rgb(p, q, nh + 1 / 3);
-    g = hue2rgb(p, q, nh);
-    b = hue2rgb(p, q, nh - 1 / 3);
-  }
-  return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
-}
+import { useState, useEffect } from 'react';
+import chroma from 'chroma-js';
+import { CopyButton } from '@/components/shared/CopyButton';
 
 export default function DevColor() {
-  const t = useTheme();
-  // HEX
   const [hex, setHex] = useState('#4F8EF7');
-  // RGB
-  const [r, setR] = useState(79);
-  const [g, setG] = useState(142);
-  const [b, setB] = useState(247);
-  // HSL
-  const [h, setH] = useState(217);
-  const [sl, setSl] = useState(91);
-  const [l, setL] = useState(64);
+  const [rgb, setRgb] = useState({ r: 79, g: 142, b: 247 });
+  const [hsl, setHsl] = useState({ h: 217, s: 91, l: 64 });
+  const [source, setSource] = useState<'hex' | 'rgb' | 'hsl'>('hex');
 
-  const [activeSource, setActiveSource] = useState<'hex' | 'rgb' | 'hsl'>('hex');
-  const [error, setError] = useState('');
-
-  useEffect(() => {
+  const updateFromHex = (h: string) => {
     try {
-      setError('');
-      if (activeSource === 'hex') {
-        const rgb = hexToRgb(hex);
-        if (!rgb) {
-          if (hex.length >= 7) setError('无效的 HEX 值');
-          return;
-        }
-        setR(rgb.r); setG(rgb.g); setB(rgb.b);
-        const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-        setH(hsl.h); setSl(hsl.s); setL(hsl.l);
-      } else if (activeSource === 'rgb') {
-        const hexVal = rgbToHex(r, g, b);
-        setHex(hexVal);
-        const hsl = rgbToHsl(r, g, b);
-        setH(hsl.h); setSl(hsl.s); setL(hsl.l);
-      } else if (activeSource === 'hsl') {
-        const rgb = hslToRgb(h, sl, l);
-        setR(rgb.r); setG(rgb.g); setB(rgb.b);
-        setHex(rgbToHex(rgb.r, rgb.g, rgb.b));
-      }
-    } catch {
-      setError('转换出错');
-    }
-  }, [hex, r, g, b, h, sl, l, activeSource]);
-
-  const clampNum = (v: number, min: number, max: number) =>
-    isNaN(v) ? min : Math.max(min, Math.min(max, v));
-
-  const st: Record<string, React.CSSProperties> = {
-    container: { padding: 20 },
-    section: { marginBottom: 20 },
-    label: { color: t.textSecondary, fontSize: 13, marginBottom: 6 },
-    inputRow: { display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' },
-    input: {
-      background: t.inputBg,
-      border: `0.5px solid ${t.border}`,
-      borderRadius: 6,
-      padding: '8px 12px',
-      color: t.text,
-      fontFamily: "'JetBrains Mono', monospace",
-      fontSize: 14,
-      outline: 'none',
-    },
-    hexInput: { width: 140 },
-    rgbInput: { width: 64 },
-    hslInput: { width: 70 },
-    inputHint: { color: t.textSecondary, fontSize: 12, fontFamily: "'JetBrains Mono', monospace" },
-    preview: {
-      borderRadius: 8,
-      marginTop: 16,
-      height: 140,
-      width: '100%',
-      border: `0.5px solid ${t.border}`,
-      transition: 'background 0.2s',
-    },
-    error: { color: t.yellow, fontSize: 12, marginTop: 4 },
+      const c = chroma(h);
+      const [rr, gg, bb] = c.rgb();
+      const [hh, ss, ll] = c.hsl();
+      setRgb({ r: rr, g: gg, b: bb });
+      setHsl({ h: Math.round(hh || 0), s: Math.round(ss * 100), l: Math.round(ll * 100) });
+    } catch { /* invalid color */ }
   };
 
+  const updateFromRgb = (r: number, g: number, b: number) => {
+    try {
+      const c = chroma(r, g, b);
+      setHex(c.hex());
+      const [hh, ss, ll] = c.hsl();
+      setHsl({ h: Math.round(hh || 0), s: Math.round(ss * 100), l: Math.round(ll * 100) });
+    } catch { /* invalid */ }
+  };
+
+  const updateFromHsl = (h: number, s: number, l: number) => {
+    try {
+      const c = chroma.hsl(h, s / 100, l / 100);
+      setHex(c.hex());
+      const [rr, gg, bb] = c.rgb();
+      setRgb({ r: rr, g: gg, b: bb });
+    } catch { /* invalid */ }
+  };
+
+  useEffect(() => {
+    if (source === 'hex') updateFromHex(hex);
+  }, [hex, source]);
+
+  const colorValid = (() => { try { chroma(hex); return true; } catch { return false; } })();
+
   return (
-    <div style={st.container}>
-      {/* HEX Input */}
-      <div style={st.section}>
-        <div style={st.label}>HEX</div>
-        <div style={st.inputRow}>
-          <span style={st.inputHint}>#</span>
-          <input
-            style={{ ...st.input, ...st.hexInput }}
-            value={hex.replace(/^#/, '')}
-            maxLength={6}
-            placeholder="4F8EF7"
-            onFocus={() => setActiveSource('hex')}
-            onChange={(e) => {
-              const val = e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 6);
-              setHex('#' + val.toUpperCase());
-              setActiveSource('hex');
-            }}
-          />
-          <span style={{ ...st.inputHint, color: hexToRgb(hex) ? t.green : t.yellow }}>
-            {hexToRgb(hex) ? '✓' : hex.length >= 7 ? '✗' : ''}
-          </span>
-        </div>
-      </div>
-
-      {/* RGB Input */}
-      <div style={st.section}>
-        <div style={st.label}>RGB</div>
-        <div style={st.inputRow}>
-          <input
-            style={{ ...st.input, ...st.rgbInput }}
-            type="number"
-            min={0} max={255}
-            value={r}
-            onFocus={() => setActiveSource('rgb')}
-            onChange={(e) => { setR(clampNum(Number(e.target.value), 0, 255)); setActiveSource('rgb'); }}
-          />
-          <input
-            style={{ ...st.input, ...st.rgbInput }}
-            type="number"
-            min={0} max={255}
-            value={g}
-            onFocus={() => setActiveSource('rgb')}
-            onChange={(e) => { setG(clampNum(Number(e.target.value), 0, 255)); setActiveSource('rgb'); }}
-          />
-          <input
-            style={{ ...st.input, ...st.rgbInput }}
-            type="number"
-            min={0} max={255}
-            value={b}
-            onFocus={() => setActiveSource('rgb')}
-            onChange={(e) => { setB(clampNum(Number(e.target.value), 0, 255)); setActiveSource('rgb'); }}
-          />
-        </div>
-      </div>
-
-      {/* HSL Input */}
-      <div style={st.section}>
-        <div style={st.label}>HSL</div>
-        <div style={st.inputRow}>
-          <input
-            style={{ ...st.input, ...st.hslInput }}
-            type="number"
-            min={0} max={360}
-            value={h}
-            onFocus={() => setActiveSource('hsl')}
-            onChange={(e) => { setH(clampNum(Number(e.target.value), 0, 360)); setActiveSource('hsl'); }}
-          />
-          <input
-            style={{ ...st.input, ...st.hslInput }}
-            type="number"
-            min={0} max={100}
-            value={sl}
-            onFocus={() => setActiveSource('hsl')}
-            onChange={(e) => { setSl(clampNum(Number(e.target.value), 0, 100)); setActiveSource('hsl'); }}
-          />
-          <input
-            style={{ ...st.input, ...st.hslInput }}
-            type="number"
-            min={0} max={100}
-            value={l}
-            onFocus={() => setActiveSource('hsl')}
-            onChange={(e) => { setL(clampNum(Number(e.target.value), 0, 100)); setActiveSource('hsl'); }}
-          />
-        </div>
-      </div>
-
-      {error && <div style={st.error}>{error}</div>}
-
-      {/* Color Preview */}
+    <div className="space-y-5">
+      {/* Color preview */}
       <div
-        style={{
-          ...st.preview,
-          background: hexToRgb(hex) ? hex : t.card,
-        }}
+        className="h-24 rounded-2xl border border-border transition-all duration-300"
+        style={{ background: colorValid ? hex : 'transparent' }}
       />
+
+      {/* HEX */}
+      <div className="space-y-1.5">
+        <label className="text-xs text-muted-foreground">HEX</label>
+        <div className="flex gap-2">
+          <input
+            value={hex}
+            onChange={(e) => { setHex(e.target.value); setSource('hex'); }}
+            placeholder="#000000"
+            className="flex-1 h-10 rounded-xl border border-border bg-background px-4 font-mono text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+          <CopyButton text={hex} />
+        </div>
+      </div>
+
+      {/* RGB */}
+      <div className="space-y-1.5">
+        <label className="text-xs text-muted-foreground">RGB</label>
+        <div className="flex gap-2">
+          {['r', 'g', 'b'].map((ch) => (
+            <div key={ch} className="flex-1 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground uppercase">{ch}</span>
+              <input
+                type="number"
+                min={0}
+                max={255}
+                value={rgb[ch as keyof typeof rgb]}
+                onChange={(e) => {
+                  const v = Math.max(0, Math.min(255, +e.target.value || 0));
+                  const newRgb = { ...rgb, [ch]: v };
+                  setRgb(newRgb);
+                  setSource('rgb');
+                  updateFromRgb(newRgb.r, newRgb.g, newRgb.b);
+                }}
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 font-mono text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* HSL */}
+      <div className="space-y-1.5">
+        <label className="text-xs text-muted-foreground">HSL</label>
+        <div className="flex gap-2">
+          {[
+            { key: 'h', max: 360, suffix: '°' },
+            { key: 's', max: 100, suffix: '%' },
+            { key: 'l', max: 100, suffix: '%' },
+          ].map(({ key, max, suffix }) => (
+            <div key={key} className="flex-1 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground uppercase">{key}</span>
+              <input
+                type="number"
+                min={0}
+                max={max}
+                value={hsl[key as keyof typeof hsl]}
+                onChange={(e) => {
+                  const v = Math.max(0, Math.min(max, +e.target.value || 0));
+                  const newHsl = { ...hsl, [key]: v };
+                  setHsl(newHsl);
+                  setSource('hsl');
+                  updateFromHsl(newHsl.h, newHsl.s, newHsl.l);
+                }}
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 font-mono text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <span className="text-xs text-muted-foreground">{suffix}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

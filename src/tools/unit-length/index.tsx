@@ -1,140 +1,18 @@
-import React, { useState } from 'react';
-import { useTheme } from '../../theme';
+import { UnitConverter } from '@/components/shared/UnitConverter';
 
-const units: { key: string; label: string; toMeters: number }[] = [
-  { key: 'km', label: '千米 (km)', toMeters: 1000 },
-  { key: 'm', label: '米 (m)', toMeters: 1 },
-  { key: 'cm', label: '厘米 (cm)', toMeters: 0.01 },
-  { key: 'mm', label: '毫米 (mm)', toMeters: 0.001 },
-  { key: 'inch', label: '英寸 (in)', toMeters: 0.0254 },
-  { key: 'ft', label: '英尺 (ft)', toMeters: 0.3048 },
-  { key: 'yard', label: '码 (yd)', toMeters: 0.9144 },
-  { key: 'mile', label: '英里 (mi)', toMeters: 1609.344 },
-  { key: 'light-year', label: '光年 (ly)', toMeters: 9.461e15 },
+const LENGTH_UNITS = [
+  { symbol: 'nm', name: '纳米', toBase: 1e-9 },
+  { symbol: 'µm', name: '微米', toBase: 1e-6 },
+  { symbol: 'mm', name: '毫米', toBase: 0.001 },
+  { symbol: 'cm', name: '厘米', toBase: 0.01 },
+  { symbol: 'm', name: '米', toBase: 1 },
+  { symbol: 'km', name: '千米', toBase: 1000 },
+  { symbol: 'in', name: '英寸', toBase: 0.0254 },
+  { symbol: 'ft', name: '英尺', toBase: 0.3048 },
+  { symbol: 'mi', name: '英里', toBase: 1609.344 },
+  { symbol: 'ly', name: '光年', toBase: 9.461e15 },
 ];
 
-const UnitLength: React.FC = () => {
-  const t = useTheme();
-  const [value, setValue] = useState<string>('1');
-  const [unit, setUnit] = useState<string>('m');
-
-  const numValue = parseFloat(value) || 0;
-  const selected = units.find((u) => u.key === unit)!;
-  const meters = numValue * selected.toMeters;
-
-  const styles = {
-    wrapper: {
-      padding: 20,
-      fontFamily: "'Noto Sans SC', sans-serif",
-      background: t.bg,
-      minHeight: '100%',
-      color: t.text,
-    } as React.CSSProperties,
-    title: {
-      color: t.text,
-      fontSize: 16,
-      fontWeight: 500,
-      marginBottom: 20,
-    } as React.CSSProperties,
-    inputRow: {
-      display: 'flex',
-      gap: 12,
-      alignItems: 'center',
-      marginBottom: 24,
-      flexWrap: 'wrap',
-    } as React.CSSProperties,
-    label: {
-      color: t.textSecondary,
-      fontSize: 13,
-      marginBottom: 4,
-    } as React.CSSProperties,
-    input: {
-      background: t.inputBg,
-      border: `0.5px solid ${t.border}`,
-      borderRadius: 6,
-      padding: '8px 12px',
-      color: t.text,
-      fontFamily: "'JetBrains Mono', monospace",
-      fontSize: 15,
-      width: 180,
-      outline: 'none',
-    } as React.CSSProperties,
-    select: {
-      background: t.inputBg,
-      border: `0.5px solid ${t.border}`,
-      borderRadius: 6,
-      padding: '8px 12px',
-      color: t.text,
-      fontFamily: "'Noto Sans SC', sans-serif",
-      fontSize: 14,
-      outline: 'none',
-      cursor: 'pointer',
-    } as React.CSSProperties,
-    grid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-      gap: 12,
-    } as React.CSSProperties,
-    card: {
-      background: t.card,
-      border: `0.5px solid ${t.border}`,
-      borderRadius: 8,
-      padding: 16,
-    } as React.CSSProperties,
-    cardUnit: {
-      color: t.textSecondary,
-      fontSize: 12,
-      marginBottom: 8,
-    } as React.CSSProperties,
-    cardValue: {
-      fontFamily: "'JetBrains Mono', monospace",
-      color: t.green,
-      fontSize: 18,
-      wordBreak: 'break-all',
-    } as React.CSSProperties,
-  };
-
-  return (
-    <div style={styles.wrapper}>
-      <div style={styles.title}>长度换算</div>
-
-      <div style={styles.label}>数值</div>
-      <div style={styles.inputRow}>
-        <input
-          type="number"
-          style={styles.input}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="输入数值"
-        />
-        <select
-          style={styles.select}
-          value={unit}
-          onChange={(e) => setUnit(e.target.value)}
-        >
-          {units.map((u) => (
-            <option key={u.key} value={u.key}>
-              {u.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div style={styles.grid}>
-        {units.map((u) => {
-          const converted = meters / u.toMeters;
-          return (
-            <div key={u.key} style={styles.card}>
-              <div style={styles.cardUnit}>{u.label}</div>
-              <div style={styles.cardValue}>
-                {converted.toFixed(6)}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-export default UnitLength;
+export default function UnitLength() {
+  return <UnitConverter units={LENGTH_UNITS} />;
+}

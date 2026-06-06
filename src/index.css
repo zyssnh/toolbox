@@ -1,141 +1,186 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@import 'tailwindcss';
 
-:root {
-  --bg: #0F0F11;
-  --card: #141418;
-  --hover: #1A1A1F;
-  --primary: #4F8EF7;
-  --green: #39D98A;
-  --text: #E0E0E8;
-  --text-secondary: #888890;
-  --border: #2a2a30;
-  --border-hover: #3a3a48;
-  --scrollbar-thumb: #2a2a30;
-  --scrollbar-thumb-hover: #3a3a42;
-  --input-bg: #0F0F11;
-  --option-bg: #141418;
+/* ---- shadcn/ui theme tokens (oklch) ---- */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: 'Inter', 'Noto Sans SC', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
-[data-theme="light"] {
-  --bg: #F5F5F8;
-  --card: #FFFFFF;
-  --hover: #F0F0F3;
-  --primary: #3B7DE6;
-  --green: #2EB87A;
-  --text: #1A1A24;
-  --text-secondary: #6B6B76;
-  --border: #E0E0E4;
-  --border-hover: #C4C4CC;
-  --scrollbar-thumb: #D0D0D8;
-  --scrollbar-thumb-hover: #B0B0B8;
-  --input-bg: #F5F5F8;
-  --option-bg: #FFFFFF;
+/* ---- Dark theme (default) — deep blue-gray palette ---- */
+:root {
+  --radius: 0.625rem;
+
+  --background: oklch(0.15 0.01 260);
+  --foreground: oklch(0.92 0.01 260);
+  --card: oklch(0.18 0.01 260);
+  --card-foreground: oklch(0.92 0.01 260);
+  --popover: oklch(0.18 0.01 260);
+  --popover-foreground: oklch(0.92 0.01 260);
+
+  /* Sky blue primary */
+  --primary: oklch(0.65 0.15 240);
+  --primary-foreground: oklch(0.98 0 0);
+
+  /* Subtle secondary */
+  --secondary: oklch(0.22 0.01 260);
+  --secondary-foreground: oklch(0.85 0.01 260);
+
+  /* Muted */
+  --muted: oklch(0.20 0.01 260);
+  --muted-foreground: oklch(0.55 0.01 260);
+
+  /* Warm amber accent */
+  --accent: oklch(0.25 0.02 80);
+  --accent-foreground: oklch(0.92 0.02 80);
+
+  --destructive: oklch(0.55 0.18 20);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --success: oklch(0.60 0.15 160);
+  --success-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.25 0.01 260);
+  --input: oklch(0.22 0.01 260);
+  --ring: oklch(0.65 0.15 240);
+
+  --scrollbar-thumb: oklch(0.25 0.01 260);
+  --scrollbar-thumb-hover: oklch(0.30 0.01 260);
+}
+
+/* ---- Light theme — warm white palette ---- */
+.light {
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.18 0.01 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.01 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.01 260);
+
+  /* Indigo blue primary */
+  --primary: oklch(0.55 0.18 260);
+  --primary-foreground: oklch(0.98 0 0);
+
+  --secondary: oklch(0.94 0.01 260);
+  --secondary-foreground: oklch(0.25 0.02 260);
+
+  --muted: oklch(0.94 0.01 260);
+  --muted-foreground: oklch(0.50 0.01 260);
+
+  /* Amber accent */
+  --accent: oklch(0.94 0.03 85);
+  --accent-foreground: oklch(0.35 0.05 85);
+
+  --destructive: oklch(0.50 0.18 20);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --success: oklch(0.55 0.15 160);
+  --success-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.88 0.01 260);
+  --input: oklch(0.96 0.01 260);
+  --ring: oklch(0.55 0.18 260);
+
+  --scrollbar-thumb: oklch(0.82 0.01 260);
+  --scrollbar-thumb-hover: oklch(0.72 0.01 260);
+}
+
+/* ---- Global resets & defaults ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.3s ease, color 0.3s ease;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.5s ease, color 0.5s ease;
 }
 
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
-
-input, textarea, select {
-  background: var(--input-bg);
-  border: 0.5px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 12px;
-  color: var(--text);
-  font-family: 'Noto Sans SC', sans-serif;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s, background 0.3s ease;
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
 }
-input:focus, textarea:focus, select:focus {
-  border-color: var(--primary);
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }
 
-select option { background: var(--option-bg); }
-
-a { color: var(--primary); text-decoration: none; }
-a:hover { color: #7aabff; }
-
-/* ---------- theme toggle button ---------- */
-.theme-toggle-btn {
-  background: none;
-  border: 0.5px solid var(--border);
-  border-radius: 20px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
-  transition: background 0.2s, border-color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.theme-toggle-btn:hover {
-  background: var(--hover);
-  border-color: var(--border-hover);
+/* ---- Global transition for theme switching ---- */
+* {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.5s;
+  transition-timing-function: ease;
 }
 
-/* ---------- Sudoku glassmorphism mesh animation ---------- */
+/* ---- Sudoku preserved animations ---- */
 @keyframes sudoku-mesh-shift {
-  0% {
-    background-position: 0% 0%, 100% 100%, 0% 100%, 100% 0%;
-  }
-  50% {
-    background-position: 3% 2%, 97% 98%, 2% 97%, 98% 3%;
-  }
-  100% {
-    background-position: 0% 0%, 100% 100%, 0% 100%, 100% 0%;
-  }
+  0%   { background-position: 0% 0%, 100% 100%, 0% 100%, 100% 0%; }
+  50%  { background-position: 3% 2%, 97% 98%, 2% 97%, 98% 3%; }
+  100% { background-position: 0% 0%, 100% 100%, 0% 100%, 100% 0%; }
 }
 
 .sudoku-glass-bg {
   will-change: background-position;
   transform: translateZ(0);
   animation: sudoku-mesh-shift 20s ease-in-out infinite;
-  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-size: 100% 100%;
 }
 
-/* ---------- Sudoku board entrance animation ---------- */
 @keyframes sudoku-board-enter {
-  0% {
-    opacity: 0;
-    transform: scale(0.92) translateY(12px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  0%   { opacity: 0; transform: scale(0.92) translateY(12px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .sudoku-board-enter {
   animation: sudoku-board-enter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* ---------- Sudoku skeleton loading pulse ---------- */
 @keyframes sudoku-skeleton-pulse {
   0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
+  50%      { opacity: 0.6; }
 }
 
 .sudoku-skeleton-cell {
   animation: sudoku-skeleton-pulse 1.2s ease-in-out infinite;
 }
 
-/* ---------- Sudoku page fade-in ---------- */
 @keyframes sudoku-page-enter {
-  0% { opacity: 0; }
+  0%   { opacity: 0; }
   100% { opacity: 1; }
 }
 
@@ -143,16 +188,9 @@ a:hover { color: #7aabff; }
   animation: sudoku-page-enter 0.2s ease-out forwards;
 }
 
-/* ---------- Sudoku control panel slide-in ---------- */
 @keyframes sudoku-panel-enter {
-  0% {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  0%   { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 1; transform: translateX(0); }
 }
 
 .sudoku-panel-enter {
@@ -160,16 +198,9 @@ a:hover { color: #7aabff; }
   opacity: 0;
 }
 
-/* ---------- Sudoku completion dialog pop ---------- */
 @keyframes sudoku-dialog-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+  0%   { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 .sudoku-dialog-pop > div {

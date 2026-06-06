@@ -1,252 +1,100 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useTheme } from '../../theme';
+import { useState, useMemo } from 'react';
+import { Check, ChevronDown } from 'lucide-react';
+import { CopyButton } from '@/components/shared/CopyButton';
+import { cn } from '@/lib/utils';
 
-const makeStyles = (t: ReturnType<typeof useTheme>): Record<string, React.CSSProperties> => ({
-  wrapper: {
-    padding: 20,
-  },
-  textarea: {
-    width: '100%',
-    minHeight: 180,
-    background: t.inputBg,
-    border: `0.5px solid ${t.border}`,
-    borderRadius: 6,
-    padding: '8px 12px',
-    color: t.text,
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 13,
-    lineHeight: 1.6,
-    resize: 'vertical' as const,
-    outline: 'none',
-    boxSizing: 'border-box' as const,
-  },
-  label: {
-    color: t.textSecondary,
-    fontSize: 13,
-    fontWeight: 500,
-    marginBottom: 6,
-    display: 'block',
-  },
-  btnRow: {
-    display: 'flex',
-    gap: 8,
-    marginTop: 12,
-    marginBottom: 4,
-    flexWrap: 'wrap' as const,
-  },
-  btn: {
-    background: t.primary,
-    color: 'white',
-    border: 'none',
-    borderRadius: 6,
-    padding: '8px 16px',
-    cursor: 'pointer',
-    fontSize: 13,
-    fontWeight: 500,
-  },
-  resultArea: {
-    background: t.inputBg,
-    border: `0.5px solid ${t.border}`,
-    borderRadius: 8,
-    padding: 16,
-    fontFamily: "'JetBrains Mono', monospace",
-    color: t.green,
-    fontSize: 14,
-    lineHeight: 1.7,
-    whiteSpace: 'pre-wrap' as const,
-    wordBreak: 'break-all' as const,
-    marginTop: 12,
-    minHeight: 60,
-  },
-  resultToolbar: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    marginTop: 8,
-  },
-  copyBtn: {
-    background: t.hover,
-    border: `0.5px solid ${t.border}`,
-    color: t.text,
-    borderRadius: 6,
-    padding: '6px 16px',
-    cursor: 'pointer',
-    fontSize: 12,
-    fontWeight: 500,
-  },
-  copySuccess: {
-    background: t.green,
-    color: t.bg,
-    border: 'none',
-  },
-  emptyResult: {
-    color: t.textHint,
-  },
-});
+type CaseStyle = 'camel' | 'pascal' | 'snake' | 'upperSnake' | 'kebab' | 'upper' | 'lower' | 'title';
 
-function splitWords(text: string): string[] {
-  return text
+const CASE_OPTIONS: { id: CaseStyle; label: string; example: string }[] = [
+  { id: 'camel', label: 'camelCase', example: 'helloWorld' },
+  { id: 'pascal', label: 'PascalCase', example: 'HelloWorld' },
+  { id: 'snake', label: 'snake_case', example: 'hello_world' },
+  { id: 'upperSnake', label: 'UPPER_SNAKE', example: 'HELLO_WORLD' },
+  { id: 'kebab', label: 'kebab-case', example: 'hello-world' },
+  { id: 'upper', label: 'UPPER CASE', example: 'HELLO WORLD' },
+  { id: 'lower', label: 'lower case', example: 'hello world' },
+  { id: 'title', label: 'Title Case', example: 'Hello World' },
+];
+
+function tokenize(str: string): string[] {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/[^a-zA-Z0-9]+/g, ' ')
     .trim()
-    .split(/[\s\-_]+/)
-    .filter((w) => w.length > 0);
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
 }
 
-function toCamelCase(text: string): string {
-  const words = splitWords(text);
-  if (words.length === 0) return '';
-  return words
-    .map((w, i) =>
-      i === 0
-        ? w.toLowerCase()
-        : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
-    )
-    .join('');
-}
-
-function toPascalCase(text: string): string {
-  const words = splitWords(text);
-  if (words.length === 0) return '';
-  return words
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join('');
-}
-
-function toSnakeCase(text: string): string {
-  return splitWords(text)
-    .map((w) => w.toLowerCase())
-    .join('_');
-}
-
-function toUpperSnakeCase(text: string): string {
-  return splitWords(text)
-    .map((w) => w.toUpperCase())
-    .join('_');
-}
-
-function toKebabCase(text: string): string {
-  return splitWords(text)
-    .map((w) => w.toLowerCase())
-    .join('-');
-}
-
-function toUpperCase(text: string): string {
-  return text.toUpperCase();
-}
-
-function toLowerCase(text: string): string {
-  return text.toLowerCase();
-}
-
-function toTitleCase(text: string): string {
-  return text.replace(
-    /\b\w+/g,
-    (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-  );
-}
-
-type CaseName =
-  | 'camelCase'
-  | 'PascalCase'
-  | 'snake_case'
-  | 'UPPER_SNAKE'
-  | 'kebab-case'
-  | 'UPPER CASE'
-  | 'lower case'
-  | 'Title Case';
-
-const converters: Record<CaseName, (text: string) => string> = {
-  camelCase: toCamelCase,
-  PascalCase: toPascalCase,
-  snake_case: toSnakeCase,
-  UPPER_SNAKE: toUpperSnakeCase,
-  'kebab-case': toKebabCase,
-  'UPPER CASE': toUpperCase,
-  'lower case': toLowerCase,
-  'Title Case': toTitleCase,
+const transformers: Record<CaseStyle, (tokens: string[]) => string> = {
+  camel: (t) => t.map((w, i) => (i === 0 ? w : w.charAt(0).toUpperCase() + w.slice(1))).join(''),
+  pascal: (t) => t.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(''),
+  snake: (t) => t.join('_'),
+  upperSnake: (t) => t.map((w) => w.toUpperCase()).join('_'),
+  kebab: (t) => t.join('-'),
+  upper: (t) => t.map((w) => w.toUpperCase()).join(' '),
+  lower: (t) => t.join(' '),
+  title: (t) => t.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
 };
 
-const TextCase: React.FC = () => {
-  const t = useTheme();
-  const styles = useMemo(() => makeStyles(t), [t]);
-
+export default function TextCase() {
   const [text, setText] = useState('');
-  const [result, setResult] = useState('');
-  const [activeCase, setActiveCase] = useState<CaseName | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [activeCase, setActiveCase] = useState<CaseStyle>('camel');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const handleConvert = useCallback(
-    (caseName: CaseName) => {
-      const converted = converters[caseName](text);
-      setResult(converted);
-      setActiveCase(caseName);
-    },
-    [text]
-  );
+  const tokens = useMemo(() => tokenize(text), [text]);
+  const result = useMemo(() => {
+    if (!text.trim() || tokens.length === 0) return '';
+    return transformers[activeCase](tokens);
+  }, [tokens, activeCase]);
 
-  const handleCopy = useCallback(async () => {
-    if (!result) return;
-    try {
-      await navigator.clipboard.writeText(result);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      const ta = document.createElement('textarea');
-      ta.value = result;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    }
-  }, [result]);
-
-  const caseNames = Object.keys(converters) as CaseName[];
+  const active = CASE_OPTIONS.find((c) => c.id === activeCase);
 
   return (
-    <div style={styles.wrapper}>
-      <label style={styles.label}>英文文本输入</label>
+    <div className="space-y-4">
       <textarea
-        style={styles.textarea}
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="输入英文文本，支持空格、下划线、连字符分隔..."
+        placeholder="输入英文文本..."
+        rows={4}
+        className="w-full rounded-xl border border-border bg-background p-4 font-mono text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-y"
       />
-      <div style={styles.btnRow}>
-        {caseNames.map((name) => (
-          <button
-            key={name}
-            style={{
-              ...styles.btn,
-              ...(activeCase === name
-                ? { background: t.green, color: t.bg }
-                : {}),
-            }}
-            onClick={() => handleConvert(name)}
-          >
-            {name}
-          </button>
-        ))}
+
+      <div className="relative">
+        <button
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm text-foreground hover:border-ring/50 transition-colors"
+        >
+          {active?.label}
+          <ChevronDown className={cn('h-4 w-4 transition-transform', dropdownOpen && 'rotate-180')} />
+        </button>
+
+        {dropdownOpen && (
+          <div className="absolute top-full mt-1 z-20 w-56 rounded-xl border border-border bg-card shadow-lg overflow-hidden">
+            {CASE_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => { setActiveCase(opt.id); setDropdownOpen(false); }}
+                className={cn(
+                  'flex items-center justify-between w-full px-4 py-2.5 text-sm transition-colors hover:bg-secondary',
+                  activeCase === opt.id ? 'text-primary' : 'text-foreground',
+                )}
+              >
+                <span>{opt.label}</span>
+                <span className="text-xs text-muted-foreground">{opt.example}</span>
+                {activeCase === opt.id && <Check className="h-4 w-4 text-primary ml-2" />}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-      <div style={styles.resultArea}>
-        <span style={result ? {} : styles.emptyResult}>
-          {result || '点击上方按钮查看转换结果'}
-        </span>
-      </div>
+
       {result && (
-        <div style={styles.resultToolbar}>
-          <button
-            style={{
-              ...styles.copyBtn,
-              ...(copied ? styles.copySuccess : {}),
-            }}
-            onClick={handleCopy}
-          >
-            {copied ? '已复制' : '复制结果'}
-          </button>
+        <div className="flex items-start justify-between gap-3 rounded-xl border border-border bg-muted/50 p-4 font-mono text-base text-foreground break-all">
+          <span className="flex-1">{result}</span>
+          <CopyButton text={result} />
         </div>
       )}
     </div>
   );
-};
-
-export default TextCase;
+}
