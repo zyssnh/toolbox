@@ -111,15 +111,7 @@
   --scrollbar-thumb-hover: oklch(0.72 0.01 260);
 }
 
-/* ---- Global resets & defaults ---- */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
+/* ---- Global resets ---- */
 body {
   background: var(--background);
   color: var(--foreground);
@@ -139,8 +131,6 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
 }
-
-/* ---- Global transition for theme switching (only on theme-related props) ---- */
 
 /* ---- Sudoku preserved animations ---- */
 @keyframes sudoku-mesh-shift {
